@@ -174,7 +174,7 @@ namespace JA.Dynamics
         #region Formatting
         public override string ToString()
         {
-            return $"World(Units={Units}, Gravity={Gravity}, RootJoints={RootJoints.Count})";
+            return $"World: Units={Units}, Gravity={Gravity}, RootJoints={RootJoints.Count}";
         }
         #endregion
     }
