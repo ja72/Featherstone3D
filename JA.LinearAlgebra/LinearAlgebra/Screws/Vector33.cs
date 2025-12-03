@@ -119,7 +119,7 @@ namespace JA.LinearAlgebra.Screws
         /// Equality overrides from <see cref="object"/>
         /// </summary>
         /// <param name="obj">The object to compare this with</param>
-        /// <returns>False if object is a different type, otherwise it calls <code>Equals(Vector33)</code></returns>
+        /// <returns>False if object is a different type, otherwise it calls <code>ApproxEquals(Vector33)</code></returns>
         public override bool Equals(object obj)
         {
             return obj is Vector33 vector&&Equals(vector);

@@ -10,6 +10,7 @@ namespace JA.LinearAlgebra.Screws
     public static class Twist3
     {
         public static ScrewLayout Layout {get; } = ScrewLayout.Axis;
+
         #region Twists
         public static Vector33 At(Vector3 value, Vector3 position, double pitch = 0)
             => new Vector33(

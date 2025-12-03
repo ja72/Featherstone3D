@@ -11,11 +11,14 @@ using JA.LinearAlgebra.Vectors;
 namespace JA.Dynamics
 {
 
+    using Element = Experimental.Element;
+
     public class World : ICanChangeUnits
     {
         internal UnitSystem units;
         internal Vector3 gravity;
         internal readonly List<JointBody> rootJoints;
+        internal readonly List<Element> elements;
 
         #region Factor
         public World(UnitSystem units)
@@ -25,7 +28,7 @@ namespace JA.Dynamics
             this.units=units;
             this.gravity=gravity;
             this.rootJoints=new List<JointBody>();
-            //this.elements=new List<Element>();
+            this.elements=new List<Element>();
         }
         #endregion
 
@@ -39,6 +42,44 @@ namespace JA.Dynamics
 
         }
 
+        #endregion
+
+        #region Elements
+        public Element.Link NewLink(Pose3 position, MassProperties massProperties)
+        {
+            var link = new Element.Link(position, massProperties);
+            link.DoConvert(Units);
+            elements.Add(link);
+            return link;
+        }
+        public Element.Link NewLink(Pose3 position)
+        {
+            var link = new Element.Link(position, MassProperties.Empty);
+            link.DoConvert(Units);
+            elements.Add(link);
+            return link;
+        }
+        public Element.Joint NewPrismatic(Vector3 axis)
+        {
+            var joint = new Element.Joint(JointType.Prismatic, axis);
+            joint.DoConvert(Units);
+            elements.Add(joint);
+            return joint;
+        }
+        public Element.Joint NewRevolute(Vector3 axis)
+        {
+            var joint = new Element.Joint(JointType.Revolute, axis);
+            joint.DoConvert(Units);
+            elements.Add(joint);
+            return joint;
+        }
+        public Element.Joint NewScrew(Vector3 axis, double pitch)
+        {
+            var joint = new Element.Joint(JointType.Screw, axis, pitch);
+            joint.DoConvert(Units);
+            elements.Add(joint);
+            return joint;
+        } 
         #endregion
 
         #region Structure
@@ -133,7 +174,7 @@ namespace JA.Dynamics
         #region Formatting
         public override string ToString()
         {
-            return $"World: Units={Units}, Gravity={Gravity}, RootJoints={RootJoints.Count}";
+            return $"World(Units={Units}, Gravity={Gravity}, RootJoints={RootJoints.Count})";
         }
         #endregion
     }

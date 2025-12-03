@@ -79,13 +79,13 @@ namespace JA.Dynamics.Featherstone
                 var drive = joints[i].motor.Compile();
                 switch (defined)
                 {
-                    case MotorDefined.Acceleration:
+                    case MotorDefined.Acceleration: //fwd dynamics
                     {
                         known[i]=JointKnown.Acceleration;
                         qpp[i]=drive(time, q[i], qp[i]);
                         break;
                     }
-                    case MotorDefined.Forcing:
+                    case MotorDefined.Forcing:  //inverse
                     {
                         known[i]=JointKnown.Forcing;
                         tau[i]=drive(time, q[i], qp[i]);

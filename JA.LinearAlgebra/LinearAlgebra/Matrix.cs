@@ -64,13 +64,17 @@ namespace JA.LinearAlgebra
                 return;
             }
             this.elements = new double[rows][];
-
-            if (values.Length<rows*cols)
+            for (int i_row = 0; i_row < rows; i_row++)
             {
-                throw new ArgumentException($"Expecting {rows*cols} values.", nameof(values));
+                var row = new double[columns];
+                int offset = i_row * columns;
+                int size = Math.Min(columns, values.Length - offset);
+                if (size>0)
+                {
+                    Array.Copy(values, offset, row, 0, size);
+                }
+                elements[i_row] = row;
             }
-
-            this.elements=values.ToJaggedArray(rows, columns);
         }
         public static Matrix FromArray2(double[,] matrix)
         {
@@ -214,7 +218,7 @@ namespace JA.LinearAlgebra
         /// Equality overrides from <see cref="System.Object"/>
         /// </summary>
         /// <param name="obj">The object to compare this with</param>
-        /// <returns>False if object is a different type, otherwise it calls <code>Equals(Vector)</code></returns>
+        /// <returns>False if object is a different type, otherwise it calls <code>ApproxEquals(Vector)</code></returns>
         public override bool Equals(object obj)
         {
             if(obj is Matrix)
@@ -225,13 +229,22 @@ namespace JA.LinearAlgebra
         }
 
         /// <summary>
-        /// Checks for equality among vectors
+        /// Checks for equality among matrices
         /// </summary>
         /// <param name="other">The other vector to compare it to</param>
         /// <returns>True if equal</returns>
         public bool Equals(Matrix other)
         {
             return NativeArrays.JaggedEquals(elements, other.elements);
+        }
+        /// <summary>
+        /// Checks for approximate equality among matrices
+        /// </summary>
+        /// <param name="other">The other vector to compare it to</param>
+        /// <returns>True if equal</returns>
+        public bool ApproxEquals(Matrix other, double tolerance = ZERO_TOL)
+        {
+            return NativeArrays.JaggedEquals(elements, other.elements, tolerance);
         }
 
         /// <summary>

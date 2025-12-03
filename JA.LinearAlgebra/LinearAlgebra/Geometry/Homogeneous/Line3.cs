@@ -86,7 +86,7 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         /// Equality overrides from <see cref="System.Object"/>
         /// </summary>
         /// <param name="obj">The object to compare this with</param>
-        /// <returns>False if object is a different type, otherwise it calls <code>Equals(Line)</code></returns>
+        /// <returns>False if object is a different type, otherwise it calls <code>ApproxEquals(Line)</code></returns>
         public override bool Equals(object obj)
         {
             if (obj is Line3 item)

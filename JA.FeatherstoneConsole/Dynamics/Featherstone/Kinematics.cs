@@ -62,6 +62,8 @@ namespace JA.Dynamics.Featherstone
                 cg[i_joint] = (pos + joint.MassProperties.CG).Position;
                 w[i_joint]= Vector33.Zero; 
 
+                //w[i_joint] = Wrench3.At( joint.massProperties.Mass * gravity, cg[i_joint]);
+
                 //tex: Spatial Inertia $$\mathbf{I}_i = \begin{bmatrix} 
                 // m_i & -m_i \vec{c}_i\times \\
                 // m_i \vec{c}_i\times & \mathrm{I}_C - m_i \vec{c}_i\times \vec{c}_i\times \end{bmatrix}$$

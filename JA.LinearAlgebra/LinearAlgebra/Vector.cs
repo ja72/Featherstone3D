@@ -30,6 +30,21 @@ namespace JA.LinearAlgebra
                 this.elements=new double[size];
             }
         }
+        public Vector(double[] elements) : this(elements.Length)
+        {
+            this.elements= elements;
+        }
+        public Vector(int size, double[] elements) : this(size)
+        {
+            Array.Copy(elements, this.elements, Math.Min(size, elements.Length));
+        }
+        public Vector(int size, double fillValue) : this(size)
+        {
+            for (int i = 0; i < elements.Length; i++)
+            {
+                elements[i] = fillValue;
+            }
+        }
         public Vector(int size, IEnumerable<double> collection) : this(size)
         {
             int index=0;
@@ -38,51 +53,39 @@ namespace JA.LinearAlgebra
                 elements[index++]=item;
             }
         }
-        public Vector(int size, Func<int, double> init)
-            : this(size)
-        {
-            for(int i=0; i<elements.Length; i++)
-            {
-                elements[i]=init(i);
-            }
-        }
-        Vector(double[] elements, bool as_readonly)
-        {
-            this.elements=elements;
-            this.size=elements.Length;
-        }
-        public Vector(params double[] elements)
-        {
-            this.elements=elements;
-            this.size=elements.Length;
-        }
-        public Vector(Vector other)
-        {
-            this.elements=new double[other.elements.Length];
-            Array.Copy(other.elements, this.elements, elements.Length);
-            this.size=other.size;
-        }
+        public Vector(Vector other) : this(other.size, other.elements)
+        { }
         public static explicit operator Vector(double[] elements)
         {
-            return new Vector(elements);
+            return new Vector(elements.Length, elements);
         }
         public static implicit operator double[](Vector vector)
         {
             return vector.elements;
         }
+        public static Vector FromValues(params double[] elements)
+        {
+            return new Vector(elements.Length, elements);
+        }
         public static Vector FillStartEnd(int count, double first_value, double last_value)
         {
             double[] result=new double[count];
             double step = (last_value-first_value)/(count-1);
-            result.FillSeries(first_value, step);
+            result.FillStartStep(first_value, step);
             return new Vector(result);
         }
         public static Vector FillStartStep(int count, double first_value, double step_value)
         {
             double[] result=new double[count];
-            result.FillSeries(first_value, step_value);
+            result.FillStartStep(first_value, step_value);
             return new Vector(result);
         }        
+        public static Vector FillSeries(int size, Func<int, double> generator)
+        {
+            double[] result=new double[size];
+            result.FillSeries(generator);
+            return new Vector(result);
+        }
         #endregion
 
         #region Properties
@@ -110,8 +113,6 @@ namespace JA.LinearAlgebra
         #endregion
 
         #region Methods
-        public Vector AsReadOnly() { return new Vector(elements, true); }
-
         public static Vector operator+(Vector v, Vector u)
         {
             return new Vector( NativeArrays.ArrayAdd(v.elements, u.elements));
@@ -152,7 +153,7 @@ namespace JA.LinearAlgebra
         /// Equality overrides from <see cref="System.Object"/>
         /// </summary>
         /// <param name="obj">The object to compare this with</param>
-        /// <returns>False if object is a different type, otherwise it calls <code>Equals(Vector)</code></returns>
+        /// <returns>False if object is a different type, otherwise it calls <code>ApproxEquals(Vector)</code></returns>
         public override bool Equals(object obj)
         {
             if(obj is Vector vec)
@@ -170,6 +171,15 @@ namespace JA.LinearAlgebra
         public bool Equals(Vector other)
         {
             return NativeArrays.ArrayEquals(elements, other.elements);
+        }
+        /// <summary>
+        /// Checks for approximate equality among vectors
+        /// </summary>
+        /// <param name="other">The other vector to compare it to</param>
+        /// <returns>True if equal</returns>
+        public bool ApproxEquals(Vector other, double tolerance = ZERO_TOL)
+        {
+            return NativeArrays.ApproxArrayEquals(elements, other.elements, tolerance);
         }
 
         /// <summary>

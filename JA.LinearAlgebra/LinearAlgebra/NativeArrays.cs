@@ -728,9 +728,9 @@ namespace JA.LinearAlgebra
         }
         public static bool ArrayEquals(this double[] vector, double[] other)
         {
-            return ArrayEquals(vector, other, ZERO_TOL);
+            return ApproxArrayEquals(vector, other, ZERO_TOL);
         }
-        public static bool ArrayEquals(this double[] vector, double[] other, double epsilon)
+        public static bool ApproxArrayEquals(this double[] vector, double[] other, double epsilon)
         {
             // true if all values in A == corresponding values in B
             if(vector.Length!=other.Length) return false;

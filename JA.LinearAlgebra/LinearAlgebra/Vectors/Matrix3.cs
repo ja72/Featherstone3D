@@ -2,6 +2,8 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+using JA.LinearAlgebra.Screws;
+
 using static System.Math;
 
 namespace JA.LinearAlgebra.Vectors
@@ -135,6 +137,11 @@ namespace JA.LinearAlgebra.Vectors
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Matrix3 MomentTensor(Vector3 v, double scale = 1)
         {
+            //tex: $${\rm mmoi}(v) = \begin{bmatrix}
+            // y^2+z^2 & -x y & -x z \\
+            // -x y & x^2+z^2 & -y z \\
+            // -x z & -y z & x^2 + y^2
+            // \end{bmatrix}$$
             if (scale==0) return Zero;
             if (scale!=1)
             {
@@ -356,8 +363,6 @@ namespace JA.LinearAlgebra.Vectors
         #endregion
 
         #region Algebra
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Vector3 Product(Vector3 v) => Product(this, v);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 Product(Matrix3 m, Vector3 v) =>
@@ -453,7 +458,17 @@ namespace JA.LinearAlgebra.Vectors
                 a.m31-b.m31, a.m32-b.m32, a.m33-b.m33);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryInvert(out Matrix3 result)
+        public Matrix3 Inverse()
+        {
+            if (!TryInverse(out var inv))
+            {
+                throw new InvalidOperationException("Matrix is singular and cannot be inverted.");
+            }
+            return inv;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryInverse(out Matrix3 result)
         {
             var det = Determinant(this);
             if (det==0.0)
@@ -480,14 +495,22 @@ namespace JA.LinearAlgebra.Vectors
             );
             return true;
         }
+        public Vector3 Solve(Vector3 b)
+        {
+            if (!TryInverse(out var inv))
+            {
+                throw new InvalidOperationException("Matrix is singular and cannot be inverted.");
+            }
+            return Product(inv, b);
+        }
         public bool TrySolve(Vector3 b, out Vector3 result)
         {
-            if (!TryInvert(out var inv))
+            if (!TryInverse(out var inv))
             {
                 result=Vector3.Zero;
                 return false;
             }
-            result=inv.Product(b);
+            result=Product(inv, b);
             return true;
         }
 

@@ -222,7 +222,7 @@ namespace JA.LinearAlgebra.Vectors
         /// Moment of inertia tensor (symmetric)
         /// </summary>
         /// <returns><code>[y^2+z^2,-x*y,-x*z; -x*y,x^2+z^2,-y*z; -x*z,y*z,x^2+y^2]</code></returns>
-        /// <remarks>Equals to <code>-CrossOp()*CrossOp()</code></remarks>
+        /// <remarks>ApproxEquals to <code>-CrossOp()*CrossOp()</code></remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Matrix3 MomentTensor(double scale = 1) => Matrix3.MomentTensor(this, scale);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

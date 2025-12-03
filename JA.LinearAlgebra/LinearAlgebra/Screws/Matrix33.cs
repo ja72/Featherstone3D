@@ -1,12 +1,13 @@
 using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 
 namespace JA.LinearAlgebra.Screws
 {
-    using Vector3 = JA.LinearAlgebra.Vectors.Vector3;
     using Matrix3 = JA.LinearAlgebra.Vectors.Matrix3;
+    using Vector3 = JA.LinearAlgebra.Vectors.Vector3;
 
     /// <summary>
     /// Immutable 2x2 block matrix where each block is a 3x3 Matrix3.
@@ -107,8 +108,8 @@ namespace JA.LinearAlgebra.Screws
             // [ a11 a12 ] * [ v1 ] = [ a11*v1 + a12*v2 ]
             // [ a21 a22 ]   [ v2 ]   [ a21*v1 + a22*v2 ]
             return new Vector33(
-                Vector3.Add(Matrix3.Product(a.a11, b.linear), Matrix3.Product(a.a12, b.angular)),
-                Vector3.Add(Matrix3.Product(a.a21, b.linear), Matrix3.Product(a.a22, b.angular))
+                ((a.a11 * b.linear) + (a.a12 * b.angular)),
+                ((a.a21 * b.linear) + (a.a22 * b.angular))
             );
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -118,8 +119,8 @@ namespace JA.LinearAlgebra.Screws
             //[ v1  v2 ] * [ a11 a12 ]  = [ a11*v1 + a21*v2  a12*v1 + a22*v2 ]
             //             [ a21 a22 ]     
             return new Vector33(
-                Vector3.Add(Matrix3.Product(a.a11, b.linear), Matrix3.Product(a.a22, b.angular)),
-                Vector3.Add(Matrix3.Product(a.a12, b.linear), Matrix3.Product(a.a22, b.angular))
+                ((a.a11 * b.linear) + (a.a22 * b.angular)),
+                ((a.a12 * b.linear) + (a.a22 * b.angular))
             );
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -129,12 +130,74 @@ namespace JA.LinearAlgebra.Screws
             // [ a11 a12 ] * [ b11 b12 ] = [ a11*b11 + a12*b21, a11*b12 + a12*b22 ]
             // [ a21 a22 ]   [ b21 b22 ]   [ a21*b11 + a22*b21, a21*b12 + a22*b22 ]
             return new Matrix33(
-                Matrix3.Add(Matrix3.Product(a.a11, b.a11), Matrix3.Product(a.a12, b.a21)),
-                Matrix3.Add(Matrix3.Product(a.a11, b.a12), Matrix3.Product(a.a12, b.a22)),
-                Matrix3.Add(Matrix3.Product(a.a21, b.a11), Matrix3.Product(a.a22, b.a21)),
-                Matrix3.Add(Matrix3.Product(a.a21, b.a12), Matrix3.Product(a.a22, b.a22))
+                ((a.a11 * b.a11) + (a.a12 * b.a21)),
+                ((a.a11 * b.a12) + (a.a12 * b.a22)),
+                ((a.a21 * b.a11) + (a.a22 * b.a21)),
+                ((a.a21 * b.a12) + (a.a22 * b.a22))
             );
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Matrix33 Transpose() => Transpose(this);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Matrix33 Transpose(Matrix33 matrix) => new Matrix33(
+            matrix.a11.Transpose(),
+            matrix.a21.Transpose(),
+            matrix.a12.Transpose(),
+            matrix.a22.Transpose()
+        );
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Matrix33 Inverse()
+        {
+            if (!TryInverse(out var inv))
+            {
+                throw new InvalidOperationException("Matrix is singular and cannot be inverted.");
+            }
+            return inv;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryInverse(out Matrix33 inverse)
+        {
+            // Inversion of a 2x2 block matrix using the blockwise inversion formula.
+            // Reference: https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_inversion
+            if (!a11.TryInverse(out Matrix3 A11_inv))
+            {
+                inverse = default;
+                return false;
+            }
+            Matrix3 S = a22 - Matrix3.Product(a21, Matrix3.Product(A11_inv, a12));
+            if (!S.TryInverse(out Matrix3 S_inv))
+            {
+                inverse = default;
+                return false;
+            }
+            Matrix3 B11 = A11_inv + Matrix3.Product(Matrix3.Product(A11_inv, a12), Matrix3.Product(S_inv, Matrix3.Product(a21, A11_inv)));
+            Matrix3 B12 = -Matrix3.Product(A11_inv, Matrix3.Product(a12, S_inv));
+            Matrix3 B21 = -Matrix3.Product(S_inv, Matrix3.Product(a21, A11_inv));
+            Matrix3 B22 = S_inv;
+            inverse = new Matrix33(B11, B12, B21, B22);
+            return true;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Vector33 Solve(Vector33 b)
+        {
+            if (!TryInverse(out var inv))
+            {
+                throw new InvalidOperationException("Matrix is singular and cannot be inverted.");
+            }
+            return Product(inv, b);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TrySolve(Vector33 b, out Vector33 result)
+        {
+            if (!TryInverse(out var inv))
+            {
+                result=Vector33.Zero;
+                return false;
+            }
+            result=Product(inv, b);
+            return true;
+        }
+
         #endregion
 
         #region Operators

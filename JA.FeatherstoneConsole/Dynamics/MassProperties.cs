@@ -165,7 +165,7 @@ namespace JA.Dynamics
         public Matrix3 GetMmoiMatrix(Quaternion3 orientation, bool inverse = false)
         {
             Matrix3 I_body = data.mmoi;
-            if(inverse && I_body.TryInvert(out var I_body_inv))
+            if(inverse && I_body.TryInverse(out var I_body_inv))
             {
                 I_body=I_body_inv;
             }
@@ -322,7 +322,7 @@ namespace JA.Dynamics
         /// Equality overrides from <see cref="System.Object"/>
         /// </summary>
         /// <param name="obj">The object to compare this with</param>
-        /// <returns>False if object is a different type, otherwise it calls <code>Equals(MassProperties)</code></returns>
+        /// <returns>False if object is a different type, otherwise it calls <code>ApproxEquals(MassProperties)</code></returns>
         public override bool Equals(object obj)
         {
             if (obj is MassProperties other)

@@ -1,8 +1,10 @@
-namespace JA.LinearAlgebra.Tests;
-
+using System;
+using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Vector = JA.LinearAlgebra.Vector;
+
+namespace JA.LinearAlgebra;
+
 
 [TestClass]
 public class VectorTests
@@ -13,7 +15,7 @@ public class VectorTests
         var empty_vector = new Vector(Array.Empty<double>());
         Assert.IsTrue( Vector.Empty.Equals( empty_vector ) );
 
-        var expected_vector = new Vector(1.0, 3.0, 5.0, 7.0, 9.0);
+        var expected_vector = Vector.FromValues(1.0, 3.0, 5.0, 7.0, 9.0);
         Assert.IsTrue( Vector.FillStartStep( 5, 1.0, 2.0 ).Equals( expected_vector ) );
         Assert.IsTrue( Vector.FillStartEnd( 5, 1.0, 9.0 ).Equals( expected_vector ) );        
     }
@@ -34,7 +36,7 @@ public class VectorTests
         {
             Assert.AreEqual(i+1.0, vector2[i]);
         }
-        var vector3 = new Vector(n_size, index => index * 1.5);
+        var vector3 = Vector.FillSeries(n_size, index => index * 1.5);
         Assert.AreEqual(n_size, vector3.Size);
         for(int i=0; i<n_size; i++)
         {
@@ -67,22 +69,22 @@ public class VectorTests
     [TestMethod]
     public void Test_Vector_Equality()
     {
-        var vector1 = new Vector(1.0, 2.0, 3.0);
-        var vector2 = new Vector(1.0, 2.0, 3.0);
-        var vector3 = new Vector(4.0, 5.0, 6.0);
+        var vector1 = Vector.FromValues(1.0, 2.0, 3.0);
+        var vector2 = Vector.FromValues(1.0, 2.0, 3.0);
+        var vector3 = Vector.FromValues(4.0, 5.0, 6.0);
         Assert.IsTrue(vector1.Equals(vector2));
         Assert.IsFalse(vector1.Equals(vector3));
     }
     [TestMethod]
     public void Test_Vector_Algebra()
     {
-        var vector1 = new Vector(1.0, 2.0, 3.0);
-        var vector2 = new Vector(4.0, 5.0, 6.0);
+        var vector1 = Vector.FromValues(1.0, 2.0, 3.0);
+        var vector2 = Vector.FromValues(4.0, 5.0, 6.0);
 
-        var add_vector_expected = new Vector(5.0, 7.0, 9.0);
-        var sub_vector_expected = new Vector(3.0, 3.0, 3.0);
-        var mul_vector_expected = new Vector(2.0, 4.0, 6.0);
-        var div_vector_expected = new Vector(2.0, 2.5, 3.0);
+        var add_vector_expected = Vector.FromValues(5.0, 7.0, 9.0);
+        var sub_vector_expected = Vector.FromValues(3.0, 3.0, 3.0);
+        var mul_vector_expected = Vector.FromValues(2.0, 4.0, 6.0);
+        var div_vector_expected = Vector.FromValues(2.0, 2.5, 3.0);
 
         var add_vector = vector1 + vector2;
         var sub_vector = vector2 - vector1;

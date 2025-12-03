@@ -275,7 +275,7 @@ namespace JA.Symbolics
         {
             if (lhs.IsConstant(0)) return rhs;
             if (rhs.IsConstant(0)) return lhs;
-            if (lhs==rhs)
+            if (lhs.Equals(rhs))
             {
                 return 2*lhs;
             }
@@ -285,6 +285,7 @@ namespace JA.Symbolics
             }
             if (lhs.IsUnaryFunction(out var lhsUnaryExpr))
             {
+                // (-x) + (y) = (y - x)
                 if (lhsUnaryExpr.Function==UnaryFunction.Neg)
                 {
                     return rhs-lhsUnaryExpr.Argument;
@@ -292,6 +293,7 @@ namespace JA.Symbolics
             }
             if (rhs.IsUnaryFunction(out var rhsUnaryExpr))
             {
+                // (x) + (-y) = (x - y)
                 if (rhsUnaryExpr.Function==UnaryFunction.Neg)
                 {
                     return lhs-rhsUnaryExpr.Argument;
@@ -458,7 +460,7 @@ namespace JA.Symbolics
         /// Equality overrides from <see cref="System.Object"/>
         /// </summary>
         /// <param name="obj">The object to compare this with</param>
-        /// <returns>False if object is a different type, otherwise it calls <code>Equals(Expr)</code></returns>
+        /// <returns>False if object is a different type, otherwise it calls <code>ApproxEquals(Expr)</code></returns>
         public override bool Equals(object obj)
         {
             return obj is Expr expr&&Equals(expr);
@@ -848,7 +850,8 @@ namespace JA.Symbolics
             public override Expr PartialDerivative(string variable)
             {
                 Expr x = Left, y = Right;
-                Expr xp = x.PartialDerivative(variable), yp = y.PartialDerivative(variable);
+                Expr xp = x.PartialDerivative(variable);
+                Expr yp = y.PartialDerivative(variable);
 
                 switch (Operator)
                 {

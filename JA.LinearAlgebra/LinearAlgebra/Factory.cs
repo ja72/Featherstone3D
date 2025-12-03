@@ -8,7 +8,6 @@ using System.Text;
 
 namespace JA.LinearAlgebra
 {
-
     public static class Factory
     {
         static readonly Random rnd=new Random();
@@ -71,7 +70,7 @@ namespace JA.LinearAlgebra
             {
                 for (int j = 0; j<cols; j++)
                 {
-                    result[i, j]=init(i,j);
+                    result[i, j]=init(i, j);
                 }
             }
             return result;
@@ -83,7 +82,7 @@ namespace JA.LinearAlgebra
         public static T[][] CreateJaggedArray<T>(int rows, int cols)
         {
             var matrix=new T[rows][];
-            for(int i=0; i<rows; i++)
+            for (int i = 0; i<rows; i++)
             {
                 matrix[i]=new T[cols];
             }
@@ -92,7 +91,7 @@ namespace JA.LinearAlgebra
         public static T[][] CreateJaggedArray<T>(int rows, int cols, T fill)
         {
             var matrix=new T[rows][];
-            for(int i=0; i<rows; i++)
+            for (int i = 0; i<rows; i++)
             {
                 var row = new T[cols];
                 for (int j = 0; j<cols; j++)
@@ -103,15 +102,15 @@ namespace JA.LinearAlgebra
             }
             return matrix;
         }
-        public static T[][] CreateJaggedArray<T>(int rows, int cols, Func<int,int,T> init)
+        public static T[][] CreateJaggedArray<T>(int rows, int cols, Func<int, int, T> init)
         {
             var matrix=new T[rows][];
-            for(int i=0; i<rows; i++)
+            for (int i = 0; i<rows; i++)
             {
                 var row = new T[cols];
                 for (int j = 0; j<cols; j++)
                 {
-                    row[j]=init(i,j);
+                    row[j]=init(i, j);
                 }
                 matrix[i]=row;
             }
@@ -159,12 +158,26 @@ namespace JA.LinearAlgebra
         }
 
         /// <summary>
+        /// Fills the series using a function generator.
+        /// </summary>
+        /// <param name="list">The list.</param>
+        /// <param name="generator">The generator.</param>
+        public static void FillSeries(this double[] list, Func<int, double> generator)
+        {
+            int count = list.Length;
+            for (int i = 0; i<count; i++)
+            {
+                list[i]=generator(i);
+            }
+        }
+
+        /// <summary>
         /// Fill in array with a linear number series.
         /// </summary>
         /// <param name="list">The array to fill</param>
         /// <param name="first_value">The first element value</param>
         /// <param name="step_value">The step in value for each element (opt)</param>
-        public static void FillSeries(this double[] list, double first_value, double step_value)
+        public static void FillStartStep(this double[] list, double first_value, double step_value)
         {
             int count = list.Length;
             if (count==1)
@@ -189,7 +202,7 @@ namespace JA.LinearAlgebra
         /// <param name="step_value">The step in value for each element (opt)</param>
         public static double[] FillSeries(int count, double first_value, double step_value)
         {
-            if(count == 0)
+            if (count == 0)
             {
                 return Array.Empty<double>();
             }
@@ -198,7 +211,7 @@ namespace JA.LinearAlgebra
                 throw new ArgumentOutOfRangeException(nameof(count), "Count must be non-negative.");
             }
             double[] list = new double[count];
-            FillSeries(list, first_value, step_value);
+            FillStartStep(list, first_value, step_value);
             return list;
         }
         #endregion
@@ -208,7 +221,7 @@ namespace JA.LinearAlgebra
         public static double[][] CreateJaggedArray(int rows, int cols)
         {
             var matrix=new double[rows][];
-            for(int i=0; i<rows; i++)
+            for (int i = 0; i<rows; i++)
             {
                 matrix[i]=new double[cols];
             }
@@ -218,7 +231,7 @@ namespace JA.LinearAlgebra
         {
             var matrix=new double[rows][];
             int k=0;
-            for(int i=0; i<rows; i++)
+            for (int i = 0; i<rows; i++)
             {
                 var row=new double[cols];
                 Array.Copy(elements, k, row, 0, Math.Min(cols, elements.Length-k));
@@ -230,10 +243,10 @@ namespace JA.LinearAlgebra
         public static double[][] CreateJaggedArray(int rows, int cols, Func<int, int, double> init)
         {
             var matrix=new double[rows][];
-            for(int i=0; i<rows; i++)
+            for (int i = 0; i<rows; i++)
             {
                 var row=new double[cols];
-                for(int j=0; j<row.Length; j++)
+                for (int j = 0; j<row.Length; j++)
                 {
                     row[j]=init(i, j);
                 }
@@ -242,14 +255,14 @@ namespace JA.LinearAlgebra
             return matrix;
         }
 
-        public static double[][] CreateJaggedIdentityMatrix(int rows, int cols=0, double scale=1)
-        {            
-            if(cols==0) { cols=rows; }
+        public static double[][] CreateJaggedIdentityMatrix(int rows, int cols = 0, double scale = 1)
+        {
+            if (cols==0) { cols=rows; }
             var matrix=new double[rows][];
-            for(int i=0; i<rows; i++)
+            for (int i = 0; i<rows; i++)
             {
                 var row=new double[cols];
-                if(i<cols)
+                if (i<cols)
                 {
                     row[i]=scale;
                 }
@@ -260,7 +273,7 @@ namespace JA.LinearAlgebra
         public static double[][] CreateJaggedDiagonalMatrix(double[] diag_values)
         {
             var matrix=new double[diag_values.Length][];
-            for(int i=0; i<matrix.Length; i++)
+            for (int i = 0; i<matrix.Length; i++)
             {
                 var row=new double[diag_values.Length];
                 row[i]=diag_values[i];
@@ -269,10 +282,10 @@ namespace JA.LinearAlgebra
             return matrix;
         }
 
-        public static double[][] CreateJaggedRandomMatrix(int rows, int cols, double min_value=0, double max_value=1)
+        public static double[][] CreateJaggedRandomMatrix(int rows, int cols, double min_value = 0, double max_value = 1)
         {
             var matrix=new double[rows][];
-            for(int i=0; i<matrix.Length; i++)
+            for (int i = 0; i<matrix.Length; i++)
             {
                 matrix[i]=CreateRandomVector(cols, min_value, max_value);
             }
@@ -297,14 +310,14 @@ namespace JA.LinearAlgebra
         }
         public static double[,] CreateArray2(int rows, int cols, params double[] elements)
         {
-            return elements.ToArray2(rows,cols);
+            return elements.ToArray2(rows, cols);
         }
         public static double[,] CreateArray2(int rows, int cols, Func<int, int, double> init)
         {
             var matrix=new double[rows,cols];
-            for(int i=0; i<rows; i++)
+            for (int i = 0; i<rows; i++)
             {
-                for(int j=0; j<cols; j++)
+                for (int j = 0; j<cols; j++)
                 {
                     matrix[i, j]=init(i, j);
                 }
@@ -312,11 +325,11 @@ namespace JA.LinearAlgebra
             return matrix;
         }
 
-        public static double[,] CreateIdentityArray2(int rows, int cols=0, double scale=1)
-        {            
-            if(cols==0) { cols=rows; }
+        public static double[,] CreateIdentityArray2(int rows, int cols = 0, double scale = 1)
+        {
+            if (cols==0) { cols=rows; }
             var matrix=new double[rows,cols];
-            for(int i=0; i<rows; i++)
+            for (int i = 0; i<rows; i++)
             {
                 matrix[i, i]=1;
             }
@@ -325,14 +338,14 @@ namespace JA.LinearAlgebra
         public static double[,] CreateDiagonalArray2(double[] diag_values)
         {
             var matrix=new double[diag_values.Length, diag_values.Length];
-            for(int i=0; i<matrix.Length; i++)
+            for (int i = 0; i<matrix.Length; i++)
             {
-                matrix[i,i]=diag_values[i];
+                matrix[i, i]=diag_values[i];
             }
             return matrix;
         }
 
-        public static double[,] CreateRandomArray2(int rows, int cols, double min_value=0, double max_value=1)
+        public static double[,] CreateRandomArray2(int rows, int cols, double min_value = 0, double max_value = 1)
         {
             var data = CreateRandomVector(rows*cols, min_value, max_value);
             return data.ToArray2(rows, cols);

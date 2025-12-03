@@ -1,0 +1,303 @@
+#LyX 2.4 created this file. For more info see https://www.lyx.org/
+\lyxformat 620
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{makeidx}
+\makeindex
+\usepackage[margin=10pt,font=small,labelfont=bf,labelsep=endash]{caption}
+\usepackage{units}
+\usepackage{footnote}
+\usepackage{booktabs}
+\usepackage{flafter}
+\usepackage{wasysym}
+\usepackage{fancyheadings}
+\usepackage{isomath}
+\usepackage{bm, upgreek}
+\usepackage{graphicx}
+\usepackage{array}
+\newcommand*{\diff}{\mathop{}\!\mathrm{d}}
+\newcommand*{\Diff}[1]{\mathop{}\!\mathrm{d^#1}}
+\newcommand*{\der}[2]{\mathop{}\!\frac{\mathrm{d}#2}{\mathrm{d}#1}}
+\newcommand*{\dder}[2]{\mathop{}\!\frac{\mathrm{d}^{2}#2}{\mathrm{d}{#1}^2}}
+\newcommand*{\nder}[3]{\mathop{}\!\frac{\mathrm{d}^{#2}#3}{\mathrm{d}#1^{#2}}}
+\newcommand*{\intg}[2]{\mathop{}\!\int {#1} \,\mathrm{d}{#2}}
+\newcommand*{\intgl}[4]{\mathop{}\!\int \limits_{#3}^{#4} #1 \,\mathrm{d}#2}
+\newcommand*{\iintg}[3]{\mathop{}\!\iint #1 \,\mathrm{d}#2\,\mathrm{d}#3}
+\newcommand*{\Rot}{\operatorname{Rot}}
+\newcommand*{\bmat}{\matrixsym}
+\newcommand*{\bvec}{\vectorsym}
+\newcommand*{\bten}{\tensorsym}
+\fancyhf{}               % Clear fancy header/footer
+\fancyhead[L]{John Alexiou}
+\fancyhead[R]{\thepage}  % Page number in Right footer
+\fancyfoot[L]{jalexiou@hotmail.com}   % My name in Left footer
+\fancyfoot[R]{\jobname}
+\makeatletter
+\let\ps@plain\ps@fancy   % Plain page style = fancy page style
+\makeatother
+%Width  of line below header
+%\setlength{\headrulewidth}{1pt}
+%\usepackage[pdfborder={0 0 0}]{hyperref}
+%\usepackage{xcolor}
+%\usepackage{asymptote}
+%\usepackage[samesize]{cancel}
+\setlength{\footnotesep}{12pt}
+\makesavenoteenv{tabular}
+%\usepackage{fancyvrb}
+% Added by lyx2lyx
+\setlength{\parskip}{\medskipamount}
+\setlength{\parindent}{0pt}
+\end_preamble
+\use_default_options true
+\begin_modules
+algorithm2e
+theorems-ams
+InStar
+multicol
+graphicboxes
+varwidth
+pdfcomment
+pdfform
+\end_modules
+\maintain_unincluded_children no
+\begin_forced_local_layout
+Format 104
+Style "In Preamble"
+	Category "FrontMatter"
+	Margin Static
+	LatexType Paragraph
+	InTitle 0
+	InPreamble 1
+	TocLevel -1000
+	ResumeCounter 0
+	StepParentCounter 0
+	NeedProtect 0
+	NeedCProtect 0
+	NeedMBoxProtect 0
+	KeepEmpty 0
+	NextNoIndent 0
+	CommandDepth 0
+	LatexName "dummy"
+	ItemCommand item
+	LabelType No_Label
+	EndLabelType No_Label
+	ParagraphGroup "0"
+	ParIndent MM
+	ParSkip 0.4
+	ItemSep 0
+	TopSep 0
+	BottomSep 0
+	LabelBottomSep 0
+	ParSep 0
+	NewLine 1
+	Align Block
+	AlignPossible Block, Center, Layout, Left, Right
+	FreeSpacing 0
+	PassThru 0
+	ParbreakIsNewline 0
+	RefPrefix OFF
+	HTMLLabelFirst 0
+	HTMLStyle
+div.standard {
+margin-bottom: 2ex;
+}
+	EndHTMLStyle
+	HTMLForceCSS 0
+	HTMLTitle 0
+	DocBookTag para
+	DocBookAbstract 0
+	DocBookSection 0
+	DocBookWrapperMergeWithPrevious 0
+	DocBookNoFontInside 0
+	Spellcheck 1
+	ForceLocal 1
+End
+Style "In Title"
+	Category "FrontMatter"
+	Margin Static
+	LatexType Paragraph
+	InTitle 1
+	InPreamble 0
+	TocLevel -1000
+	ResumeCounter 0
+	StepParentCounter 0
+	NeedProtect 0
+	NeedCProtect 0
+	NeedMBoxProtect 0
+	KeepEmpty 0
+	NextNoIndent 0
+	CommandDepth 0
+	LatexName "dummy"
+	ItemCommand item
+	LabelType No_Label
+	EndLabelType No_Label
+	ParagraphGroup "0"
+	ParIndent MM
+	ParSkip 0.4
+	ItemSep 0
+	TopSep 0
+	BottomSep 0
+	LabelBottomSep 0
+	ParSep 0
+	NewLine 1
+	Align Block
+	AlignPossible Block, Center, Layout, Left, Right
+	FreeSpacing 0
+	PassThru 0
+	ParbreakIsNewline 0
+	RefPrefix OFF
+	HTMLLabelFirst 0
+	HTMLStyle
+div.standard {
+margin-bottom: 2ex;
+}
+	EndHTMLStyle
+	HTMLForceCSS 0
+	HTMLTitle 0
+	DocBookTag para
+	DocBookAbstract 0
+	DocBookSection 0
+	DocBookWrapperMergeWithPrevious 0
+	DocBookNoFontInside 0
+	Spellcheck 1
+	ForceLocal 1
+End
+\end_forced_local_layout
+\language english
+\language_package default
+\inputencoding auto-legacy
+\fontencoding auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_roman_osf false
+\font_sans_osf false
+\font_typewriter_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\output_sync_macro "\usepackage[active]{srcltx}"
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_formatted_ref 0
+\use_minted 0
+\use_lineno 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 20mm
+\topmargin 30mm
+\rightmargin 20mm
+\bottommargin 40mm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 2
+\papersides 1
+\paperpagestyle fancy
+\tablestyle default
+\listings_params "mathescape=true"
+\tracking_changes false
+\output_changes false
+\change_bars false
+\postpone_fragile_content false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\docbook_table_output 0
+\docbook_mathml_prefix 1
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+a_{i-1}=b_{i-1}-\Lambda_{i-1}^{-1}f_{i}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{gathered}a_{i}=a_{i-1}+\kappa_{i}+s_{i}\ddot{q}_{i}\\
+a_{i}=b_{i-1}-\Lambda_{i-1}^{-1}f_{i}+\kappa_{i}+s_{i}\ddot{q}_{i}\\
+f_{i}=I_{i}a_{i}+p_{i}+f_{i+1}\\
+f_{i}=I_{i}\left(b_{i-1}-\Lambda_{i-1}^{-1}f_{i}+\kappa_{i}+s_{i}\ddot{q}_{i}\right)+p_{i}+f_{i+1}\\
+\left(1+I_{i}\Lambda_{i-1}^{-1}\right)f_{i}=I_{i}\left(b_{i-1}+\kappa_{i}\right)+I_{i}s_{i}\ddot{q}_{i}+\left(p_{i}+f_{i+1}\right)\\
+I_{i}^{M}=\left(1+I_{i}\Lambda_{i-1}^{-1}\right)^{-1}I_{i}\\
+f_{i}=I_{i}^{M}\left(b_{i-1}+\kappa_{i}\right)+I_{i}^{M}s_{i}\ddot{q}_{i}+I_{i}^{M}I_{i}^{-1}\left(p_{i}+f_{i+1}\right)\\
+Q_{i}=\left(s_{i}^{\intercal}I_{i}^{M}s_{i}\right)\ddot{q}_{i}+s_{i}^{\intercal}\left(I_{i}^{M}\left(b_{i-1}+\kappa_{i}\right)+I_{i}^{M}I_{i}^{-1}\left(p_{i}+f_{i+1}\right)\right)\\
+\ddot{q}_{i}=\left(s_{i}^{\intercal}I_{i}^{M}s_{i}\right)^{-1}\left(Q_{i}-s_{i}^{\intercal}\left(I_{i}^{M}\left(b_{i-1}+\kappa_{i}\right)+I_{i}^{M}I_{i}^{-1}\left(p_{i}+f_{i+1}\right)\right)\right)\\
+a_{i}=s_{i}\left(s_{i}^{\intercal}I_{i}^{M}s_{i}\right)^{-1}Q_{i}+\left(1-s_{i}\left(s_{i}^{\intercal}I_{i}^{M}s_{i}\right)^{-1}s_{i}^{\intercal}I_{i}^{M}\right)\left(b_{i-1}+\kappa_{i}\right)-s_{i}\left(s_{i}^{\intercal}I_{i}^{M}s_{i}\right)^{-1}s_{i}^{\intercal}I_{i}^{M}I_{i}^{-1}\left(p_{i}+f_{i+1}\right)-\Lambda_{i-1}^{-1}f_{i}\\
+a_{i}=s_{i}\left(s_{i}^{\intercal}I_{i}^{M}s_{i}\right)^{-1}Q_{i}+\left(1-s_{i}T_{i}^{\intercal}\right)\left(b_{i-1}+\kappa_{i}\right)-s_{i}T_{i}^{\intercal}I_{i}^{-1}\left(p_{i}+f_{i+1}\right)-\Lambda_{i-1}^{-1}f_{i}\\
+\left(1+\Lambda_{i-1}^{-1}I_{i}\right)a_{i}=s_{i}\left(s_{i}^{\intercal}I_{i}^{M}s_{i}\right)^{-1}Q_{i}+\left(1-s_{i}T_{i}^{\intercal}\right)\left(b_{i-1}+\kappa_{i}\right)-\left(s_{i}T_{i}^{\intercal}I_{i}^{-1}+\Lambda_{i-1}^{-1}\right)\left(p_{i}+f_{i+1}\right)\\
+\Phi_{i}=1+I_{i}\Lambda_{i-1}^{-1}\\
+T_{i}=\Phi_{i}^{-1}I_{i}s_{i}\left(s_{i}^{\intercal}\Phi_{i}^{-1}I_{i}s_{i}\right)^{-1}\\
+\Lambda_{i}^{-1}=\left(1+\Lambda_{i-1}^{-1}I_{i}\right)^{-1}\left(s_{i}T_{i}^{\intercal}I_{i}^{-1}+\Lambda_{i-1}^{-1}\right)\\
+b_{i}=\Phi_{i}^{-1}\left(s_{i}\left(s_{i}^{\intercal}\Phi_{i}^{-1}I_{i}s_{i}\right)^{-1}Q_{i}+\left(1-s_{i}T_{i}^{\intercal}\right)\left(b_{i-1}+\kappa_{i}\right)\right)-\Lambda_{i}^{-1}p_{i}\\
+\\a_{i}=b_{i}-\Lambda_{i}^{-1}f_{i+1}
+\end{gathered}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\begin{gathered}\Lambda_{0}^{-1}=0\\
+\Lambda_{1}^{-1}=s_{1}T_{1}^{\intercal}I_{1}^{-1}\\
+b_{1}=s_{1}\left(s_{1}^{\intercal}I_{1}s_{1}\right)^{-1}Q_{1}-\Lambda_{1}^{-1}p_{1}
+\end{gathered}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
