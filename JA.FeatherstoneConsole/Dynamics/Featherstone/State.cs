@@ -1,14 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 
-using JA.LinearAlgebra;
-using JA.LinearAlgebra.Screws;
-using JA.LinearAlgebra.Vectors;
-
 namespace JA.Dynamics.Featherstone
 {
-    using svec = Vector33;
-    using smat = Matrix33;
+    using JA.LinearAlgebra;
+    using JA.LinearAlgebra.Screws;
 
     public enum JointKnown
     {
@@ -108,7 +104,7 @@ namespace JA.Dynamics.Featherstone
             articulated.Calculate(this, kinematics);
             dynamics.Calculate(this, kinematics, articulated);
         }
-        public void DoFeatherstone(double time, StackedVector Y, out svec[] residualForces )
+        public void DoFeatherstone(double time, StackedVector Y, out Vector33[] residualForces )
         {
             int dof = simulation.Dof;
             this.time=time;

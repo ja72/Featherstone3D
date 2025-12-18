@@ -3,11 +3,13 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+using JA.LinearAlgebra.Geometry.Spatial;
+
 
 namespace JA.LinearAlgebra.Screws
 {
-    using Matrix3 = JA.LinearAlgebra.Vectors.Matrix3;
-    using Vector3 = JA.LinearAlgebra.Vectors.Vector3;
+    using Matrix3 = Matrix3;
+    using Vector3 = Geometry.Spatial.Vector3;
 
     /// <summary>
     /// Immutable 2x2 block matrix where each block is a 3x3 Matrix3.

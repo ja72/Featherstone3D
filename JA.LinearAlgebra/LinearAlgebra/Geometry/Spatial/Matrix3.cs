@@ -6,7 +6,7 @@ using JA.LinearAlgebra.Screws;
 
 using static System.Math;
 
-namespace JA.LinearAlgebra.Vectors
+namespace JA.LinearAlgebra.Geometry.Spatial
 {
 
     /// <summary>
@@ -167,7 +167,7 @@ namespace JA.LinearAlgebra.Vectors
             {
                 angle=-angle;
             }
-            double cos = Math.Cos(angle), sin = Math.Sin(angle);
+            double cos = Cos(angle), sin = Sin(angle);
             Matrix3 vx = axis.CrossOp();
             Matrix3 vxx = axis.MomentTensor();
             return Identity+vx*sin+vxx*( cos-1 );
@@ -182,7 +182,7 @@ namespace JA.LinearAlgebra.Vectors
             {
                 throw new ArgumentException("Quaternion must be non-zero.", nameof(q));
             }
-            var invlen = 1.0 / Math.Sqrt(norm2);
+            var invlen = 1.0 / Sqrt(norm2);
 
             double w = q.w * invlen;
             double x = q.x * invlen;
@@ -211,7 +211,7 @@ namespace JA.LinearAlgebra.Vectors
             double x = m32-m23, y = m13-m31, z = m21-m12;
             double r2 = x*x+y*y+z*z;
             double tr =  m11+m22+m33;
-            double w = 0.5 * Math.Sqrt( r2/(3-tr));
+            double w = 0.5 * Sqrt( r2/(3-tr));
             return new Quaternion3(w, x/( 4*w ), y/( 4*w ), z/( 4*w ));
         }
 

@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JA.LinearAlgebra.Geometry
+namespace JA.Drawing.Geometry.Spatial
 {
     public class Pose
     {
@@ -27,18 +27,18 @@ namespace JA.LinearAlgebra.Geometry
         public Matrix4x4 ToTransformation() => Matrix4x4.CreateFromQuaternion(Orientation) * Matrix4x4.CreateTranslation(Position);
         public Vector3 TransformedPoint(Vector3 point)
         {
-            Vector3 rotatedPoint = Vector3.Transform(point, Orientation);
+            var rotatedPoint = Vector3.Transform(point, Orientation);
             return Position + rotatedPoint;
         }
         public Vector3 TransformedNormal(Vector3 point)
         {
-            Vector3 rotatedPoint = Vector3.Transform(point, Orientation);
+            var rotatedPoint = Vector3.Transform(point, Orientation);
             return rotatedPoint;
         }
         public Vector3[] TransformedPoints(Vector3[] points)
         {
             Matrix4x4 transformation = ToTransformation();
-            Vector3[] result = new Vector3[points.Length];
+            var result = new Vector3[points.Length];
             for (int i = 0; i<result.Length; i++)
             {
                 result[i] = Vector3.Transform(points[i], transformation);
@@ -48,7 +48,7 @@ namespace JA.LinearAlgebra.Geometry
         public Vector3[] TransformedNormals(Vector3[] points)
         {
             Matrix4x4 transformation = ToRotation();
-            Vector3[] result = new Vector3[points.Length];
+            var result = new Vector3[points.Length];
             for (int i = 0; i<result.Length; i++)
             {
                 result[i] = Vector3.TransformNormal(points[i], transformation);

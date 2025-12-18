@@ -1,15 +1,19 @@
 ﻿using System.Runtime.CompilerServices;
 
+using JA.LinearAlgebra.Geometry.Spatial;
+
 namespace JA.LinearAlgebra.Screws
 {
     //using JA.LinearAlgebra.VectorCalculus;
     
-    using Vector3 = Vectors.Vector3;
-    using Matrix3 = Vectors.Matrix3;
+    using Vector3 = Vector3;
+    using Matrix3 = Matrix3;
 
     public static class Twist3
     {
         public static ScrewLayout Layout {get; } = ScrewLayout.Axis;
+
+        public static bool IsPureTwist(this Vector33 twist) => twist.angular.IsZero();
 
         #region Twists
         public static Vector33 At(Vector3 value, Vector3 position, double pitch = 0)
@@ -82,6 +86,15 @@ namespace JA.LinearAlgebra.Screws
             //tex: $$r = \frac{ \omega \times v}{\|\omega\|^2}$$
             => Vector3.Cross(twist.angular, twist.linear)/twist.angular.MagnitudeSquared;
         #endregion
+
+        public static Vector33 DoConvertTwist(this Vector33 twist, UnitSystem from, UnitSystem to, Unit quantity)
+        {
+            float f_len = Units.GetFactor(UnitType.Length, from, to);
+            float f_qty = quantity.Convert(from, to);
+            var linear = twist.linear * f_len * f_qty;
+            var angular = twist.angular * f_qty;
+            return new Vector33(linear, angular);
+        }
 
     }
 }

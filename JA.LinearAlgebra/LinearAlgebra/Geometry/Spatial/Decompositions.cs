@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 using static System.Math;
 
-namespace JA.LinearAlgebra.Vectors
+namespace JA.LinearAlgebra.Geometry.Spatial
 {
     /// <summary>
     /// Polar and SVD decompositions of 3×3 matrices.
@@ -241,7 +241,7 @@ namespace JA.LinearAlgebra.Vectors
 
             double dfdA = (2.0*f*f + 2.0*A) / denom;
             double dfdB = -2.0 / denom;
-            double dfdC = (8.0*f) / denom;
+            double dfdC = 8.0*f / denom;
 
             Matrix3 dAdM = 2.0 * M;
             Matrix3 dBdM = 4.0 * Matrix3.Product(M, Matrix3.TransposeProduct(M, M));
@@ -270,8 +270,8 @@ namespace JA.LinearAlgebra.Vectors
             if (r*r<q*q*q)
             {
                 // Three Real Roots
-                double t = Acos( Numerics.Clamp(r / Sqrt(q*q*q), -1.0, 1.0));
-                double x0 = -2.0 * Sqrt(q) * Cos((t             ) / 3.0) - a / 3.0;
+                double t = Acos( r / Sqrt(q*q*q).Clamp(-1.0, 1.0));
+                double x0 = -2.0 * Sqrt(q) * Cos(t              / 3.0) - a / 3.0;
                 double x1 = -2.0 * Sqrt(q) * Cos((t + 2.0 * PI) / 3.0) - a / 3.0;
                 double x2 = -2.0 * Sqrt(q) * Cos((t - 2.0 * PI) / 3.0) - a / 3.0;
                 return Abs(x0)>Abs(x1)&&Abs(x0)>Abs(x2) ? x0 :
@@ -283,7 +283,7 @@ namespace JA.LinearAlgebra.Vectors
                 double e = Pow(Sqrt(r*r - q*q*q) + Abs(r), 1.0 / 3.0);
                 e=r>0.0 ? -e : e;
                 double f = e == 0.0 ? 0.0 : q / e;
-                return ( e+f )-a/3.0;
+                return  e+f -a/3.0;
             }
         }
 
@@ -313,8 +313,8 @@ namespace JA.LinearAlgebra.Vectors
             {
                 q1=( y+Sqrt(D) )*0.5;
                 q2=( y-Sqrt(D) )*0.5;
-                p1=( -c )/( q1-q2 );
-                p2=( +c )/( q1-q2 );
+                p1= -c /( q1-q2 );
+                p2= +c /( q1-q2 );
             }
 
             // Find first two roots

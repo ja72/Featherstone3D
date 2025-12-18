@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using JA.LinearAlgebra.Vectors;
+using JA.LinearAlgebra.Geometry.Spatial;
 
 namespace JA.Dynamics.Experimental
 {
+    using static JA.Units;
     public abstract class Element : ITree<Element>
     {
         readonly List<Element> children;
@@ -14,13 +15,13 @@ namespace JA.Dynamics.Experimental
         #region Factory
         protected Element()
         {
-            this.Units=UnitSystem.MKS;
+            this.UnitSystem=UnitSystem.MKS;
             this.parent=null;
             this.children=new List<Element>();
         }
         protected Element(Element parent)
         {
-            this.Units=parent.Units;
+            this.UnitSystem=parent.UnitSystem;
             this.parent=parent;
             this.children=new List<Element>();
 
@@ -78,10 +79,10 @@ namespace JA.Dynamics.Experimental
         public abstract bool IsJoint { get; }
         public int TotalDOF { get => children.Sum((e) => e.TotalDOF)+ThisDOF; }
         public int ThisDOF { get => IsJoint ? 1 : 0; }
-        public UnitSystem Units { get; }
+        public UnitSystem UnitSystem { get; }
         public virtual void DoConvert(UnitSystem target)
         {
-            if (Units==target) return;
+            if (UnitSystem==target) return;
             foreach (var item in children)
             {
                 item.DoConvert(target);
@@ -116,12 +117,12 @@ namespace JA.Dynamics.Experimental
             public Link(Pose3 localStep, MassProperties massProperties) : base()
             {
                 this.LocalStep=localStep;
-                this.MassProperties=massProperties.ToConverted(Units);
+                this.MassProperties=massProperties.ToConverted(UnitSystem);
             }
             public Link(Element parent, Pose3 localStep, MassProperties massProperties) : base(parent)
             {
                 this.LocalStep=localStep;
-                this.MassProperties=massProperties.ToConverted(Units);
+                this.MassProperties=massProperties.ToConverted(UnitSystem);
             } 
             #endregion
 
@@ -134,7 +135,7 @@ namespace JA.Dynamics.Experimental
             #region Units
             public override void DoConvert(UnitSystem target)
             {
-                LocalStep=LocalStep.ToConvertedFrom(Units, target);
+                LocalStep=LocalStep.ToConvertedFrom(UnitSystem, target);
                 MassProperties=MassProperties.ToConverted(target);
                 base.DoConvert(target);
             } 
@@ -212,9 +213,7 @@ namespace JA.Dynamics.Experimental
             #region Units
             public override void DoConvert(UnitSystem target)
             {
-                float f_len = Unit.Length.Convert(Units, target);
-                float f_tq = Unit.Torque.Convert(Units, target);
-                float f_frc = Unit.Force.Convert(Units, target);
+                float f_len = Units.Length.Convert(UnitSystem, target);
 
                 pitch*=f_len;
 

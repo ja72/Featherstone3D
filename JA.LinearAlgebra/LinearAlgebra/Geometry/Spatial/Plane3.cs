@@ -6,14 +6,16 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+using JA.LinearAlgebra.Geometry.Spatial;
+
 using static System.Math;
 
 //using Vector4 = System.Numerics.Vector4;
 
 namespace JA.LinearAlgebra.Geometry.Homogeneous
 {
-    using Vector3 = Vectors.Vector3;
-    using Quaternion3 = Vectors.Quaternion3;
+    using Vector3 = Vector3;
+    using Quaternion3 = Quaternion3;
 
     /// <summary>Represents a plane in three-dimensional space.</summary>
     public struct Plane3 : IEquatable<Plane3>

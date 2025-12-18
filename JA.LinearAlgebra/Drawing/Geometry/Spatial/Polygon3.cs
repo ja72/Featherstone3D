@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace JA.LinearAlgebra.Geometry
+using JA.LinearAlgebra;
+
+namespace JA.Drawing.Geometry.Spatial
 {
     public readonly struct Polygon3 
     {

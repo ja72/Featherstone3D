@@ -17,7 +17,7 @@ namespace JA
         public Material(UnitSystem units, float density, float elastic, float poissons, float cte, MaterialSpec spec = MaterialSpec.Custom)
         {
             Spec = spec;
-            Units = units;
+            UnitSystem = units;
             Density = density;
             Elastic = elastic;
             Poissons = poissons;
@@ -25,7 +25,7 @@ namespace JA
         }
         Material(MaterialSpec spec)
         {
-            Units = UnitSystem.MKS;
+            UnitSystem = UnitSystem.MKS;
             Spec = spec;
             switch (spec)
             {
@@ -58,7 +58,7 @@ namespace JA
 
         internal static Material Test(UnitSystem units) => new Material(units, 1, 1, 1, 1);
 
-        public UnitSystem Units { get; }
+        public UnitSystem UnitSystem { get; }
         public MaterialSpec Spec { get; }
         public float Density { get; }
         public float Elastic { get; }
@@ -67,13 +67,13 @@ namespace JA
 
         public Material ToConverted(UnitSystem target)
         {
-            if (Units != target)
+            if (UnitSystem != target)
             {
                 return new Material(target,
-                    Density * Unit.Density.Convert(Units, target),
-                    Elastic * Unit.Pressure.Convert(Units, target),
+                    Density * Units.Density.Convert(UnitSystem, target),
+                    Elastic * Units.Pressure.Convert(UnitSystem, target),
                     Poissons,
-                    CTE * Unit.PerTemperature.Convert(Units, target),
+                    CTE     * Units.PerTemperature.Convert(UnitSystem, target),
                     Spec);
             }
             return this;
@@ -104,7 +104,7 @@ namespace JA
         {
             if (Spec == MaterialSpec.Custom || other.Spec == MaterialSpec.Custom)
             {
-                other = other.ToConverted(Units);
+                other = other.ToConverted(UnitSystem);
 
                 return Density.Equals(other.Density)
                     && Elastic.Equals(other.Elastic)
@@ -125,7 +125,7 @@ namespace JA
             unchecked
             {
                 int hc = -1817952719;
-                hc = (-1521134295) * hc + Units.GetHashCode();
+                hc = (-1521134295) * hc + UnitSystem.GetHashCode();
                 hc = (-1521134295) * hc + Density.GetHashCode();
                 hc = (-1521134295) * hc + Elastic.GetHashCode();
                 hc = (-1521134295) * hc + Poissons.GetHashCode();

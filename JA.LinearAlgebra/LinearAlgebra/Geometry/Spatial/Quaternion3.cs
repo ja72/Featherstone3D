@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace JA.LinearAlgebra.Vectors
+namespace JA.LinearAlgebra.Geometry.Spatial
 {
     /// <summary>
     /// Immutable quaternion using double precision. 

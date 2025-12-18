@@ -6,29 +6,28 @@ using System.Linq;
 
 using JA.Dynamics.Featherstone;
 using JA.LinearAlgebra;
+using JA.LinearAlgebra.Geometry.Spatial;
 using JA.LinearAlgebra.Screws;
-using JA.LinearAlgebra.Vectors;
 
 namespace JA.Dynamics
 {
-    public class Simulation
+    public class Simulation : IHasUnits
     {
         readonly Vector3 gravity;
         readonly JointBodyInfo[] joints;
         readonly int[] parents;
         readonly int[][] children;
         readonly List<(double t, StackedVector Y)> history;
-        //readonly double[] initialPos, initialVel;
         readonly State state;
 
         #region Factory
         public Simulation(World world)
         {
             // Set everything to MKS for simulation
-            this.Units=UnitSystem.MKS;
-            float f_acc = Unit.Acceleration.Convert(world.units, Units);
+            this.UnitSystem=UnitSystem.MKS;
+            float f_acc = Units.Acceleration.Convert(world.units, UnitSystem);
             gravity=f_acc*world.gravity;
-            var allJoints = world.GetAllJoints(Units);
+            var allJoints = world.GetAllJoints(UnitSystem);
             int n = allJoints.Length;
             this.joints   = allJoints;
             this.parents  = new int[n];
@@ -53,7 +52,7 @@ namespace JA.Dynamics
 
             for (int i = 0; i<n; i++)
             {
-                joints[i].DoConvert(Units);
+                joints[i].DoConvert(UnitSystem);
             }
             this.state = new State(this);
             this.history=new List<(double t, StackedVector Y)>();
@@ -69,7 +68,7 @@ namespace JA.Dynamics
         public JointBodyInfo[] Joints => joints;
         public int[] Parents => parents;
         public int[][] Children => children;
-        public UnitSystem Units { get; }
+        public UnitSystem UnitSystem { get; }
         public IReadOnlyList<(double t, StackedVector Y)> History => history;
         public double Time { get => history[history.Count-1].t; }
         public StackedVector Current { get => history[history.Count-1].Y; }
@@ -170,7 +169,7 @@ namespace JA.Dynamics
         #region Formatting
         public override string ToString()
         {
-            return $"Simulation(Units={Units}, Joints={Joints.Length}, Gravity={Gravity})";
+            return $"Simulation(Units={UnitSystem}, Joints={Joints.Length}, Gravity={Gravity})";
         }
         #endregion
 

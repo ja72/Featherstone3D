@@ -6,16 +6,18 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+using JA.Drawing.Geometry.Spatial;
+using JA.LinearAlgebra.Geometry.Spatial;
 using JA.LinearAlgebra.Screws;
 
 
 namespace JA.Dynamics
 {
-    using Vector3 = JA.LinearAlgebra.Vectors.Vector3;
-    using Matrix3 = JA.LinearAlgebra.Vectors.Matrix3;
-    using Quaternion3 = JA.LinearAlgebra.Vectors.Quaternion3;
-    using Pose3 = JA.LinearAlgebra.Vectors.Pose3;
-    using Mesh3 = JA.LinearAlgebra.Geometry.Mesh3;
+    using Vector3 = Vector3;
+    using Matrix3 = Matrix3;
+    using Quaternion3 = Quaternion3;
+    using Pose3 = Pose3;
+    using Mesh3 = Mesh3;
 
     using Vector33 = JA.LinearAlgebra.Screws.Vector33;
     using Matrix33 = JA.LinearAlgebra.Screws.Matrix33;
@@ -33,7 +35,7 @@ namespace JA.Dynamics
         public MassProperties(UnitSystem units, float mass, Matrix3 mmoi, Vector3 cg) : this(units, (mass, mmoi, cg)) { }
         public MassProperties(UnitSystem units, (float mass, Matrix3 mmoi, Vector3 cg) data)
         {
-            this.Units = units;
+            this.UnitSystem = units;
             this.data = data;
         }
         public static UnitSystem DefaultUnits { get; } = UnitSystem.MKS;
@@ -41,12 +43,12 @@ namespace JA.Dynamics
         public static MassProperties Default { get; } = new MassProperties(DefaultUnits, 1.0f, Matrix3.Scalar(1.0f), Vector3.Zero);
         public MassProperties WithMass(float mass) 
             => data.mass>0 
-            ? new MassProperties(Units, ( mass, (mass/data.mass)*data.mmoi, data.cg ))
-            : new MassProperties(Units, ( mass, data.mmoi, data.cg ));
+            ? new MassProperties(UnitSystem, ( mass, (mass/data.mass)*data.mmoi, data.cg ))
+            : new MassProperties(UnitSystem, ( mass, data.mmoi, data.cg ));
         #endregion
 
         #region Properties
-        public UnitSystem Units { get; }
+        public UnitSystem UnitSystem { get; }
         public float Mass
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -66,7 +68,7 @@ namespace JA.Dynamics
         public MassProperties At(Pose3 @base)
         {
             var newCg = Pose3.Add(@base, data.cg);
-            return new MassProperties(Units, data.mass, data.mmoi, newCg.Position);
+            return new MassProperties(UnitSystem, data.mass, data.mmoi, newCg.Position);
         }
 
         #endregion
@@ -81,7 +83,7 @@ namespace JA.Dynamics
                     mass / 2 * radius * radius),
                     Vector3.Zero);
         public static MassProperties Cylinder(Material material, float radius, float height)
-            => Cylinder(material.Units, material.Density * (float)Math.PI * radius * radius * height, radius, height);
+            => Cylinder(material.UnitSystem, material.Density * (float)Math.PI * radius * radius * height, radius, height);
         public static MassProperties Sphere(UnitSystem units, float mass, float radius)
             => new MassProperties(units,
                 mass,
@@ -91,7 +93,7 @@ namespace JA.Dynamics
                     2 * mass / 5 * radius * radius),
                     Vector3.Zero);
         public static MassProperties Sphere(Material material, float radius)
-            => Sphere(material.Units, material.Density * (4f / 3f) * (float)Math.PI * radius * radius * radius, radius);
+            => Sphere(material.UnitSystem, material.Density * (4f / 3f) * (float)Math.PI * radius * radius * radius, radius);
         public static MassProperties Box(UnitSystem units, float mass, float width, float height, float thickness)
         {
             float I_xx = mass/12*( thickness*thickness+height*height );
@@ -106,20 +108,20 @@ namespace JA.Dynamics
                         Vector3.Zero);
         }
         public static MassProperties Box(Material material, float width, float height, float thickness) 
-            => Box(material.Units, material.Density*width*height*thickness, width, height, thickness);
+            => Box(material.UnitSystem, material.Density*width*height*thickness, width, height, thickness);
 
         public static MassProperties FromMeshAndMass(Mesh3 mesh, float mass)
         {
             GetVolumeProperties(mesh, out _, out var c, out var I);
             I *= mass;
-            return new MassProperties(mesh.Units, mass, I, c);
+            return new MassProperties(mesh.UnitSystem, mass, I, c);
         }
         public static MassProperties FromMeshAndDensity(Mesh3 mesh, float density)
         {
             GetVolumeProperties(mesh, out var volume, out var c, out var I);
             float mass = density * volume;
             I *= mass;
-            return new MassProperties(mesh.Units, mass, I, c);
+            return new MassProperties(mesh.UnitSystem, mass, I, c);
         }
         static void GetVolumeProperties(Mesh3 mesh, out float volume, out Vector3 center, out Matrix3 specificMmoi)
         {
@@ -260,24 +262,24 @@ namespace JA.Dynamics
         #region Algebra
         public static MassProperties Scale(float factor, MassProperties a)
         {
-            return new MassProperties(a.Units, factor * a.Mass, factor * a.Mmoi, a.CG);
+            return new MassProperties(a.UnitSystem, factor * a.Mass, factor * a.Mmoi, a.CG);
         }
 
         public static MassProperties Add(MassProperties a, MassProperties b)
         {
-            if (a.Units != b.Units) throw new NotSupportedException();
+            if (a.UnitSystem != b.UnitSystem) throw new NotSupportedException();
             float m = a.Mass + b.Mass;
             var cg = (a.CG * a.Mass + b.CG * b.Mass)/m;
             var mmoi = a.Mmoi + a.Mass * a.CG.MomentTensor() + b.Mmoi + b.Mass * b.CG.MomentTensor();
-            return new MassProperties(a.Units, m, mmoi - m * cg.MomentTensor(), cg);
+            return new MassProperties(a.UnitSystem, m, mmoi - m * cg.MomentTensor(), cg);
         }
         public static MassProperties Subtract(MassProperties a, MassProperties b)
         {
-            if (a.Units != b.Units) throw new NotSupportedException();
+            if (a.UnitSystem != b.UnitSystem) throw new NotSupportedException();
             float m = a.Mass - b.Mass;
             var cg = (a.CG * a.Mass - b.CG * b.Mass) / m;
             var mmoi = a.Mmoi + a.Mass * a.CG.MomentTensor() - b.Mmoi - b.Mass * b.CG.MomentTensor();
-            return new MassProperties(a.Units, m, mmoi - m * cg.MagnitudeSquared, cg);
+            return new MassProperties(a.UnitSystem, m, mmoi - m * cg.MagnitudeSquared, cg);
         }
 
         public static MassProperties operator +(MassProperties a, MassProperties b) => Add(a, b);
@@ -292,9 +294,9 @@ namespace JA.Dynamics
         {
             if (Mmoi.IsDIagonal())
             {
-                return $"MassProp(Units={Units}, Mass={Mass:g3}, MMOI={Mmoi.ToDiagonalVector():g3}, CG={CG:g3})";
+                return $"MassProp(Units={UnitSystem}, Mass={Mass:g3}, MMOI={Mmoi.ToDiagonalVector():g3}, CG={CG:g3})";
             }
-            return $"MassProp(Units={Units}, Mass={Mass:g3}, MMOI={Mmoi:g3}, CG={CG:g3})";
+            return $"MassProp(Units={UnitSystem}, Mass={Mass:g3}, MMOI={Mmoi:g3}, CG={CG:g3})";
         }
 
         #endregion
@@ -302,11 +304,11 @@ namespace JA.Dynamics
         #region Units
         public MassProperties ToConverted(UnitSystem target)
         {
-            if (Units == target) return this;
+            if (UnitSystem == target) return this;
 
-            float f_mass = Unit.Mass.Convert(Units, target);
-            float f_mmoi = Unit.MassMomentOfInertia.Convert(Units, target);
-            float f_len = Unit.Length.Convert(Units, target);
+            float f_mass = Units.Mass.Convert(UnitSystem, target);
+            float f_mmoi = Units.MassMomentOfInertia.Convert(UnitSystem, target);
+            float f_len =  Units.Length.Convert(UnitSystem, target);
 
             var copy = (
                 f_mass * data.mass,

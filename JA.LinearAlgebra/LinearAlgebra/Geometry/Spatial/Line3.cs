@@ -3,12 +3,14 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Xml;
 
+using JA.LinearAlgebra.Geometry.Spatial;
+
 using static System.Math;
 
 namespace JA.LinearAlgebra.Geometry.Homogeneous
 {
-    using Quaternion3 = Vectors.Quaternion3;
-    using Vector3 = Vectors.Vector3;
+    using Quaternion3 = Quaternion3;
+    using Vector3 = Vector3;
 
     public struct Line3 : IEquatable<Line3>
     {

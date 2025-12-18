@@ -76,7 +76,6 @@ public class MatrixTests
     {
         // Arrange
         var matrix = new Matrix(3,3, 1d,2d,3d,4d,5d,6d,7d,8d,9d);            
-
         // Act
         string result = matrix.ToString();
         string expected = $"[1,2,3|4,5,6|7,8,9]";

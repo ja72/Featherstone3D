@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JA.LinearAlgebra.Vectors
+namespace JA.LinearAlgebra.Geometry.Spatial
 {
     public readonly struct Pose3 : ICanConvertUnits<Pose3>
     {
@@ -92,7 +92,7 @@ namespace JA.LinearAlgebra.Vectors
         public Pose3 ToConvertedFrom(UnitSystem units, UnitSystem target)
         {
             if(units == target) return this;
-            float f_len = Unit.Length.Convert(units, target);
+            float f_len = Units.Length.Convert(units, target);
             return new Pose3(f_len*Position, Orientation);
         }
 

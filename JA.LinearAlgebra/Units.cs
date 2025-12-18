@@ -5,6 +5,8 @@ using System.Linq;
 
 namespace JA
 {
+    using static Units;
+
     public enum UnitSystem
     {
         [Description("Meter-Kilogram-Second")]
@@ -15,16 +17,16 @@ namespace JA
         CMKS,
         [Description("Millimeter-Gram-Second")]
         MMGS,
-        [Description("Millimeter-Kilogram-Second")] 
+        [Description("Millimeter-Kilogram-Second")]
         MMKS,
-        [Description("Inch-Pound-Second")] 
+        [Description("Inch-Pound-Second")]
         IPS,
-        [Description("Foot-Pound-Second")] 
+        [Description("Foot-Pound-Second")]
         FPS,
     }
     public interface IHasUnits
     {
-        UnitSystem Units { get; }
+        UnitSystem UnitSystem { get; }
     }
     public interface ICanChangeUnits : IHasUnits
     {
@@ -38,7 +40,7 @@ namespace JA
     {
         void DoConvertFrom(UnitSystem units, UnitSystem target);
     }
-    public interface ICanConvertUnits<T> 
+    public interface ICanConvertUnits<T>
     {
         T ToConvertedFrom(UnitSystem units, UnitSystem target);
     }
@@ -111,44 +113,18 @@ namespace JA
             }
             if (unit is ComplexUnit cu)
             {
-                return Combine((float)Math.Pow(cu.Scale, exponent),  cu.Parts.Select((u) => Raise(u, exponent)).ToArray());
+                return Combine((float)Math.Pow(cu.Scale, exponent), cu.Parts.Select((u) => Raise(u, exponent)).ToArray());
             }
             return new RaiseUnit(unit, exponent);
         }
 
         #endregion
 
-        #region Common Units
-        public static readonly Unit None = new NoUnit();
-        public static readonly Unit Angle = new BaseUnit(UnitType.None);
-        public static readonly Unit Length = new BaseUnit(UnitType.Length);
-        public static readonly Unit Mass = new BaseUnit(UnitType.Mass);
-        public static readonly Unit Force = new BaseUnit(UnitType.Force);
-        public static readonly Unit Time = new BaseUnit(UnitType.Time);
-        public static readonly Unit Temperature = new BaseUnit(UnitType.Temperature);
-        public static readonly Unit Speed = Length/Time;
-        public static readonly Unit Acceleration = Speed/Time;
-        public static readonly Unit RotationalSpeed = Angle/Time;
-        public static readonly Unit RotationalAcceleration = RotationalSpeed/Time;
-        public static readonly Unit Torque = Force * Length;
-        public static readonly Unit Momentum = Mass*Speed;
-        public static readonly Unit Impulse = Force * Time;
-        public static readonly Unit Work = Force * Length;
-        public static readonly Unit Power = Force * Speed;
-        public static readonly Unit PerTemperature = 1/Temperature;
-        public static readonly Unit Area = Length ^ 2;
-        public static readonly Unit Volume = Length ^ 3;
-        public static readonly Unit Density = Mass/Volume;
-        public static readonly Unit Pressure = Force/Area;
-        public static readonly Unit AreaMoment = Length ^ 4;
-        public static readonly Unit MassMomentOfInertia = Mass*Area;
-        #endregion
-
         public static implicit operator Unit(float factor) => Derived(factor, None);
         public static implicit operator Unit(UnitType type) => Base(type);
 
         #region Properties
-        public bool IsScalar { get => this is NoUnit || (this is BaseUnit u_base && u_base.Type==UnitType.None); }
+        public bool IsScalar { get => this is NoUnit || ( this is BaseUnit u_base && u_base.Type==UnitType.None ); }
         public bool IsBase { get => this is BaseUnit u_base && u_base.Type != UnitType.None; }
 
         public bool IsComplex(out float scale, out Unit[] parts)
@@ -183,10 +159,11 @@ namespace JA
         public static Unit operator /(Unit a, Unit b) => Combine(a, Raise(b, -1));
         public static Unit operator ^(Unit a, int exponent) => Raise(a, exponent);
         public static float operator |(Unit a, UnitSystem units) => a.Factor(units);
+        public static Unit operator *(Unit a, UnitType unit) => Combine(a, Base(unit));
         #endregion
 
         #region Unit Nodes
-        class NoUnit : Unit
+        internal class NoUnit : Unit
         {
             public override float Factor(UnitSystem units) => 1;
             public override UnitType GetBase() => UnitType.None;
@@ -208,7 +185,7 @@ namespace JA
                 return string.Empty;
             }
         }
-        class BaseUnit : Unit
+        internal class BaseUnit : Unit
         {
             public BaseUnit(UnitType type)
             {
@@ -246,7 +223,7 @@ namespace JA
                 return Type.ToString();
             }
         }
-        class RaiseUnit : Unit
+        internal class RaiseUnit : Unit
         {
             public RaiseUnit(Unit argument, int exponent)
             {
@@ -267,10 +244,10 @@ namespace JA
                     case -1: return 1/f;
                     case 2: return f*f;
                     case 3: return f*f*f;
-                    case -2: return 1/(f*f);
-                    case -3: return 1/(f*f*f);
+                    case -2: return 1/( f*f );
+                    case -3: return 1/( f*f*f );
                     default:
-                        return (float)Math.Pow(f, Exponent);
+                    return (float)Math.Pow(f, Exponent);
                 }
             }
             public override bool Equals(Unit other)
@@ -288,8 +265,8 @@ namespace JA
                 unchecked
                 {
                     int hc = -1817952719;
-                    hc = (-1521134295)*hc + Exponent.GetHashCode();
-                    hc = (-1521134295)*hc + Argument.GetHashCode();
+                    hc = ( -1521134295 )*hc + Exponent.GetHashCode();
+                    hc = ( -1521134295 )*hc + Argument.GetHashCode();
                     return hc;
                 }
             }
@@ -298,14 +275,14 @@ namespace JA
                 return Argument.IsBase ? $"{Argument}^{Exponent}" : $"({Argument})^{Exponent}";
             }
         }
-        class ComplexUnit : Unit
+        internal class ComplexUnit : Unit
         {
             public ComplexUnit(params Unit[] parts)
                 : this(1, parts) { }
             public ComplexUnit(float scale, Unit[] parts)
             {
                 //Combine all complex parts
-                while (parts.Any(u=> u is ComplexUnit))
+                while (parts.Any(u => u is ComplexUnit))
                 {
                     List<Unit> temp = new List<Unit>(parts.Length);
                     for (int i = 0; i < parts.Length; i++)
@@ -397,10 +374,10 @@ namespace JA
             public override int GetHashCode()
             {
                 int hc = -1817952719;
-                hc = (-1521134295)*hc + Scale.GetHashCode();
+                hc = ( -1521134295 )*hc + Scale.GetHashCode();
                 for (int i = 0; i < Parts.Length; i++)
                 {
-                    hc = (-1521134295)*hc + Parts[i].GetHashCode();
+                    hc = ( -1521134295 )*hc + Parts[i].GetHashCode();
                 }
                 return hc;
             }
@@ -447,19 +424,19 @@ namespace JA
             switch (type)
             {
                 case UnitType.None:
-                    return 1;
+                return 1;
                 case UnitType.Length:
-                    return LengthFactor(units);
+                return LengthFactor(units);
                 case UnitType.Mass:
-                    return MassFactor(units);
+                return MassFactor(units);
                 case UnitType.Force:
-                    return ForceFactor(units);
+                return ForceFactor(units);
                 case UnitType.Time:
-                    return 1;
+                return 1;
                 case UnitType.Temperature:
-                    return TemperatureFactor(units);
+                return TemperatureFactor(units);
                 default:
-                    throw new NotSupportedException(type.ToString());
+                throw new NotSupportedException(type.ToString());
             }
         }
         static float LengthFactor(UnitSystem units)
@@ -467,19 +444,19 @@ namespace JA
             switch (units)
             {
                 case UnitSystem.MKS:
-                    return 1f;
+                return 1f;
                 case UnitSystem.CMKS:
                 case UnitSystem.CMGS:
-                    return 0.01f;
+                return 0.01f;
                 case UnitSystem.MMKS:
                 case UnitSystem.MMGS:
-                    return 0.001f;
+                return 0.001f;
                 case UnitSystem.IPS:
-                    return 0.0254f;
+                return 0.0254f;
                 case UnitSystem.FPS:
-                    return 12 * 0.0254f;
+                return 12 * 0.0254f;
                 default:
-                    throw new NotSupportedException(units.ToString());
+                throw new NotSupportedException(units.ToString());
             }
         }
         static float MassFactor(UnitSystem units)
@@ -489,15 +466,15 @@ namespace JA
                 case UnitSystem.MKS:
                 case UnitSystem.MMKS:
                 case UnitSystem.CMKS:
-                    return 1f;
+                return 1f;
                 case UnitSystem.MMGS:
                 case UnitSystem.CMGS:
-                    return 0.001f;
+                return 0.001f;
                 case UnitSystem.IPS:
                 case UnitSystem.FPS:
-                    return 0.4535924f;
+                return 0.4535924f;
                 default:
-                    throw new NotSupportedException(units.ToString());
+                throw new NotSupportedException(units.ToString());
             }
         }
         static float ForceFactor(UnitSystem units)
@@ -505,20 +482,20 @@ namespace JA
             switch (units)
             {
                 case UnitSystem.MKS:
-                    return 1f;
+                return 1f;
                 case UnitSystem.CMKS:
-                    return 100f;
+                return 100f;
                 case UnitSystem.MMKS:
-                    return 1000f;
+                return 1000f;
                 case UnitSystem.CMGS:
-                    return 100000f;
+                return 100000f;
                 case UnitSystem.MMGS:
-                    return 1000000f;
+                return 1000000f;
                 case UnitSystem.IPS:
                 case UnitSystem.FPS:
-                    return 4.4482216f;
+                return 4.4482216f;
                 default:
-                    throw new NotSupportedException(units.ToString());
+                throw new NotSupportedException(units.ToString());
             }
         }
         static float TemperatureFactor(UnitSystem units)
@@ -526,25 +503,52 @@ namespace JA
             switch (units)
             {
                 case UnitSystem.MKS:
-                    return 1f;
+                return 1f;
                 case UnitSystem.MMKS:
                 case UnitSystem.MMGS:
                 case UnitSystem.CMKS:
                 case UnitSystem.CMGS:
-                    return 1f;
+                return 1f;
                 case UnitSystem.IPS:
                 case UnitSystem.FPS:
-                    return 1/1.8f;
+                return 1/1.8f;
                 default:
-                    throw new NotSupportedException(units.ToString());
+                throw new NotSupportedException(units.ToString());
             }
         }
 
         #endregion
 
     }
-    public static class UnitSystemExtensions
+    public static class Units
     {
+        #region Common Units
+        public static readonly Unit None = new Unit.NoUnit();
+        public static readonly Unit Angle = new Unit.BaseUnit(UnitType.None);
+        public static readonly Unit Length = new Unit.BaseUnit(UnitType.Length);
+        public static readonly Unit Mass = new Unit.BaseUnit(UnitType.Mass);
+        public static readonly Unit Force = new Unit.BaseUnit(UnitType.Force);
+        public static readonly Unit Time = new Unit.BaseUnit(UnitType.Time);
+        public static readonly Unit Temperature = new Unit.BaseUnit(UnitType.Temperature);
+        public static readonly Unit Speed = Length/Time;
+        public static readonly Unit Acceleration = Speed/Time;
+        public static readonly Unit RotationalSpeed = Angle/Time;
+        public static readonly Unit RotationalAcceleration = RotationalSpeed/Time;
+        public static readonly Unit Torque = Force * Length;
+        public static readonly Unit Momentum = Mass*Speed;
+        public static readonly Unit Impulse = Force * Time;
+        public static readonly Unit Work = Force * Length;
+        public static readonly Unit Power = Force * Speed;
+        public static readonly Unit PerTemperature = 1/Temperature;
+        public static readonly Unit Area = Length ^ 2;
+        public static readonly Unit Volume = Length ^ 3;
+        public static readonly Unit Density = Mass/Volume;
+        public static readonly Unit Pressure = Force/Area;
+        public static readonly Unit AreaMoment = Length ^ 4;
+        public static readonly Unit MassMomentOfInertia = Mass*Area;
+        #endregion
+
+        #region Conversions
         public static float GetFactor(this UnitType type, UnitSystem from, UnitSystem target)
         {
             var n = Unit.GetFactor(type, target);
@@ -558,7 +562,7 @@ namespace JA
 
         public static float GetFactor(this IHasUnits hasUnits, UnitType type, UnitSystem target)
         {
-            return GetFactor(type, hasUnits.Units, target);
+            return GetFactor(type, hasUnits.UnitSystem, target);
         }
 
         public static bool IsConsistent(this UnitSystem units)
@@ -566,17 +570,17 @@ namespace JA
             switch (units)
             {
                 case UnitSystem.MKS:
-                    return true;
+                return true;
                 case UnitSystem.MMKS:
                 case UnitSystem.MMGS:
                 case UnitSystem.CMKS:
                 case UnitSystem.CMGS:
-                    return false;
+                return false;
                 case UnitSystem.IPS:
                 case UnitSystem.FPS:
-                    return false;
+                return false;
                 default:
-                    throw new NotSupportedException($"Unknown unit system {units}");
+                throw new NotSupportedException($"Unknown unit system {units}");
             }
         }
         public static bool IsMetric(this UnitSystem units)
@@ -588,12 +592,12 @@ namespace JA
                 case UnitSystem.MMGS:
                 case UnitSystem.CMKS:
                 case UnitSystem.CMGS:
-                    return true;
+                return true;
                 case UnitSystem.IPS:
                 case UnitSystem.FPS:
-                    return false;
+                return false;
                 default:
-                    throw new NotSupportedException($"Unknown unit system {units}");
+                throw new NotSupportedException($"Unknown unit system {units}");
             }
         }
         public static float EarthGravity(this UnitSystem units)
@@ -601,23 +605,23 @@ namespace JA
             switch (units)
             {
                 case UnitSystem.MKS:
-                    return 9.8065f;
+                return 9.8065f;
                 case UnitSystem.CMGS:
                 case UnitSystem.CMKS:
-                    return 980.65f;
+                return 980.65f;
                 case UnitSystem.MMKS:
                 case UnitSystem.MMGS:
-                    return 9806.5f;
+                return 9806.5f;
                 case UnitSystem.IPS:
-                    return 386.0885827f;
+                return 386.0885827f;
                 case UnitSystem.FPS:
-                    return 32.1740486f;
+                return 32.1740486f;
                 default:
-                    throw new NotSupportedException($"Unknown unit system {units}");
+                throw new NotSupportedException($"Unknown unit system {units}");
             }
         }
+
+        #endregion
     }
-
-
 
 }

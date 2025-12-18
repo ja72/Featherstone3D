@@ -9,7 +9,7 @@ using JA.LinearAlgebra.Screws;
 
 using static System.Math;
 
-namespace JA.LinearAlgebra.Vectors
+namespace JA.LinearAlgebra.Geometry.Spatial
 {
 
     public enum Axis

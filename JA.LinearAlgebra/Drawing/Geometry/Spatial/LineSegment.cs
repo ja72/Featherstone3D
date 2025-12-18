@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using static System.Math;
 
-namespace JA.LinearAlgebra.Geometry
+namespace JA.Drawing.Geometry.Spatial
 {
     public readonly struct LineSegment
     {

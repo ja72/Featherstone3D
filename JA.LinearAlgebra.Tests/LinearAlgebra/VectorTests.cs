@@ -14,7 +14,7 @@ public class VectorTests
     {
         var empty_vector = new Vector(Array.Empty<double>());
         Assert.IsTrue( Vector.Empty.Equals( empty_vector ) );
-
+        
         var expected_vector = Vector.FromValues(1.0, 3.0, 5.0, 7.0, 9.0);
         Assert.IsTrue( Vector.FillStartStep( 5, 1.0, 2.0 ).Equals( expected_vector ) );
         Assert.IsTrue( Vector.FillStartEnd( 5, 1.0, 9.0 ).Equals( expected_vector ) );        

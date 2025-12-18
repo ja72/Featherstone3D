@@ -2,11 +2,12 @@
 using System.Numerics;
 
 
-namespace JA.LinearAlgebra.Geometry
+namespace JA.Drawing.Geometry.Spatial
 {
     public readonly struct Circle3 : ICanConvertUnits<Circle3>
     {
         public const float ZERO_TOL = 1e-6f;
+
         #region Factory
         public Circle3(Vector3 center, Vector3 normal, float radius) : this()
         {
@@ -42,6 +43,7 @@ namespace JA.LinearAlgebra.Geometry
         }
 
         #endregion
+
         #region Peoperties
         public Vector3 Center { get; }
         public Vector3 Normal { get; }
@@ -81,7 +83,7 @@ namespace JA.LinearAlgebra.Geometry
                 }
                 delta = Vector3.Cross(Normal, temp);
             }
-            Vector3 dir = Vector3.Normalize(delta);
+            var dir = Vector3.Normalize(delta);
             return Center + Radius * dir;
         }
 
@@ -134,7 +136,7 @@ namespace JA.LinearAlgebra.Geometry
 
         public Circle3 ToConvertedFrom(UnitSystem units, UnitSystem target)
         {
-            var fl = Unit.Length.Convert(units, target);
+            var fl = Units.Length.Convert(units, target);
 
             return new Circle3(fl*Center, Normal, fl*Radius);
         }

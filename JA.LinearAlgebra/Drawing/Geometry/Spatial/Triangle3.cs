@@ -3,10 +3,11 @@ using System.Drawing;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Linq;
-using JA.LinearAlgebra.Geometry;
 
-namespace JA.LinearAlgebra.Geometry
+namespace JA.Drawing.Geometry.Spatial
 {
+    using JA.LinearAlgebra;
+
     public readonly struct Triangle3 : ICanConvertUnits<Triangle3>
     {
         public const float ZERO_TOL = 1e-6f;
@@ -175,7 +176,7 @@ namespace JA.LinearAlgebra.Geometry
 
         public Triangle3 ToConvertedFrom(UnitSystem units, UnitSystem target)
         {
-            var f_len = Unit.Length.Convert(units, target);
+            var f_len = Units.Length.Convert(units, target);
             return new Triangle3(
                 f_len * A,
                 f_len * B,

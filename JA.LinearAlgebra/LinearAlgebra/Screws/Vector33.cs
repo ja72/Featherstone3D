@@ -9,13 +9,15 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
+using JA.LinearAlgebra.Geometry.Spatial;
+
 using static System.Math;
 
 namespace JA.LinearAlgebra.Screws
 {
     //using JA.LinearAlgebra.VectorCalculus;
 
-    using Vector3 = Vectors.Vector3;
+    using Vector3 = Vector3;
 
     public enum ScrewLayout
     {

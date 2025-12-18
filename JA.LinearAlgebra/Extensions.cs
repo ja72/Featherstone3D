@@ -16,19 +16,23 @@ namespace JA
     using Matrix = JA.LinearAlgebra.Matrix;
     using StackedMatrix = JA.LinearAlgebra.StackedMatrix;
 
-    public static class Numerics
+    public static class Extensions
     {
-        static readonly Random rng = new Random();
-        public static Random RandomNumberGenerator { get => rng; }
-        public static int Clamp(this int x, int low=0, int high=1)
+        #region Math
+        public static int Clamp(this int x, int low = 0, int high = 1)
             => Max(low, Min(high, x));
-        public static float Clamp(this float x, float low=0, float high=1)
+        public static float Clamp(this float x, float low = 0, float high = 1)
             => Max(low, Min(high, x));
-        public static double Clamp(this double x, double low=0, double high=1)
-            => Max(low, Min(high, x));
+        public static double Clamp(this double x, double low = 0, double high = 1)
+            => Max(low, Min(high, x)); 
+        #endregion
 
+        #region Randomness
+        public static Random RandomNumberGenerator { get => rng; }
+        static readonly Random rng = new Random();
         public static double Uniform(this Random random, double low = 0, double high = 1)
-            => low+( high-low )*random.NextDouble();
+            => low+( high-low )*random.NextDouble(); 
+        #endregion
 
         #region Formatting
         public static string ToStringList(this double[] elements, string format, string delimiter = ",")

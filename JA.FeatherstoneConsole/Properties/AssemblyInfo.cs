@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("JA.FeatherstoneConsole")]
+[assembly: AssemblyTitle("FeatherstoneApp")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("John Alexiou")]
-[assembly: AssemblyProduct("JA.FeatherstoneConsole")]
+[assembly: AssemblyProduct("JA.FeatherstoneApp")]
 [assembly: AssemblyCopyright("Copyright ©  2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

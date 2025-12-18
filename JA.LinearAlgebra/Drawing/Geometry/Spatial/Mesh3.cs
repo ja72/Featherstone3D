@@ -8,8 +8,9 @@ using System.Numerics;
 
 using static System.Math;
 
-namespace JA.LinearAlgebra.Geometry
+namespace JA.Drawing.Geometry.Spatial
 {
+    using JA.LinearAlgebra;
 
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class Face
@@ -41,33 +42,33 @@ namespace JA.LinearAlgebra.Geometry
         #region Factory
         public Mesh3(UnitSystem units)
         {
-            Units=units;
+            UnitSystem=units;
             nodeList=new List<Vector3>();
             faceList=new List<Face>();
         }
 
         public Mesh3(Mesh3 copy)
         {
-            Units=copy.Units;
+            UnitSystem=copy.UnitSystem;
             nodeList=new List<Vector3>(copy.nodeList);
             faceList=new List<Face>(copy.faceList);
         }
 
         Mesh3(UnitSystem units, IEnumerable<Vector3> nodeList, IEnumerable<Face> elementList) : this(units)
         {
-            Units=units;
+            UnitSystem=units;
             this.nodeList=new List<Vector3>(nodeList);
             this.faceList=new List<Face>(elementList);
         }
         #endregion
 
         #region Properties
-        public UnitSystem Units { get; }
+        public UnitSystem UnitSystem { get; }
         public Mesh3 ToConverted(UnitSystem target)
         {
-            if (Units!=target)
+            if (UnitSystem!=target)
             {
-                float fl = Unit.Length.Convert(Units, target);
+                float fl = Units.Length.Convert(UnitSystem, target);
                 return new Mesh3(target,
                     nodeList.Select((n) => fl*n),
                     faceList);
@@ -265,30 +266,30 @@ namespace JA.LinearAlgebra.Geometry
         //public Vector3[] GetNodes() => nodeList.ToArray();
         public Mesh3 Scale(float factor)
         {
-            return new Mesh3(Units, nodeList.Select((n) => factor*n), faceList);
+            return new Mesh3(UnitSystem, nodeList.Select((n) => factor*n), faceList);
         }
         public Mesh3 Offset(Vector3 offset)
         {
-            return new Mesh3(Units, nodeList.Select((n) => n+offset), faceList);
+            return new Mesh3(UnitSystem, nodeList.Select((n) => n+offset), faceList);
         }
         public Mesh3 Transform(Matrix4x4 transform, bool inverse = false)
         {
             if (inverse)
             {
                 Matrix4x4.Invert(transform, out var inv);
-                return new Mesh3(Units, nodeList.Select((n) => Vector3.Transform(n, inv)), faceList);
+                return new Mesh3(UnitSystem, nodeList.Select((n) => Vector3.Transform(n, inv)), faceList);
             }
-            return new Mesh3(Units, nodeList.Select((n) => Vector3.Transform(n, transform)), faceList);
+            return new Mesh3(UnitSystem, nodeList.Select((n) => Vector3.Transform(n, transform)), faceList);
         }
         public Mesh3 Rotate(Quaternion rotation)
         {
-            return new Mesh3(Units,
+            return new Mesh3(UnitSystem,
                 nodeList.Select((n) => Vector3.Transform(n, rotation)),
                 faceList);
         }
         public Mesh3 Rotate(Quaternion rotation, Vector3 pivot)
         {
-            return new Mesh3(Units,
+            return new Mesh3(UnitSystem,
                 nodeList.Select((n) => pivot+Vector3.Transform(n-pivot, rotation)),
                 faceList);
         }
@@ -432,8 +433,8 @@ namespace JA.LinearAlgebra.Geometry
                                   allLines.Skip(lineCount - 2).Take(1).First();
 
                 /* check the file is ascii or not */
-                if (( firstLine.IndexOf("solid")!=-1 )&
-                    ( endLines.IndexOf("endsolid")!=-1 ))
+                if ( firstLine.IndexOf("solid")!=-1 &
+                     endLines.IndexOf("endsolid")!=-1 )
                 {
                     isBinary=false;
                 }

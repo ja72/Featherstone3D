@@ -9,27 +9,34 @@ using System.Drawing;
 namespace JA
 {
     using JA.LinearAlgebra;
+    using JA.Drawing.Geometry.Spatial;
 
-    using Vector3 = JA.LinearAlgebra.Vectors.Vector3;
-    using Matrix3 = JA.LinearAlgebra.Vectors.Matrix3;
+    using Vector3 = JA.LinearAlgebra.Geometry.Spatial.Vector3;
+    using Matrix3 = JA.LinearAlgebra.Geometry.Spatial.Matrix3;
 
     using Expr = JA.Symbolics.Expr;
-    using Mesh3 = JA.LinearAlgebra.Geometry.Mesh3;
     using World = JA.Dynamics.World;
     using Motor = JA.Dynamics.Motor;
     using MassProperties = JA.Dynamics.MassProperties;
     using MotorDefined = JA.Dynamics.MotorDefined;
+    using System.Windows.Forms;
+    using JA.UI;
 
     internal class Program
     {
         static readonly Random rng = new Random();
+
+        [STAThread()]
         static void Main(string[] args)
         {
             //TestStackedVector();
             //TestMotorDrive();
             //TestMeshObject();
+            //TestSimulationOne();
             //TestSimulationTwo();
-            TestSimulationChain();
+            //TestSimulationChain();
+
+            Application.Run(new FeatherstoneForm());
         }
 
         static void TestSimulationOne()
