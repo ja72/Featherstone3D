@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Numerics;
 
-
-namespace JA.Drawing.Geometry.Spatial
+namespace JA.Geometry.Spatial
 {
     public readonly struct Circle3 : ICanConvertUnits<Circle3>
     {
         public const float ZERO_TOL = 1e-6f;
 
         #region Factory
-        public Circle3(Vector3 center, Vector3 normal, float radius) : this()
+        public Circle3(Point3 center, Vector3 normal, float radius) : this()
         {
             Center=center;
             Normal= Vector3.Normalize(normal);
             Radius=radius;
         }
-        public static Circle3 Circumscribed(Vector3 A, Vector3 B, Vector3 C)
+        public static Circle3 Circumscribed(Point3 A, Point3 B, Point3 C)
             => Circumscribed(new Triangle3(A, B, C));
         public static Circle3 Circumscribed(Triangle3 triangle)
         {
@@ -45,29 +44,29 @@ namespace JA.Drawing.Geometry.Spatial
         #endregion
 
         #region Peoperties
-        public Vector3 Center { get; }
+        public Point3 Center { get; }
         public Vector3 Normal { get; }
         public float Radius { get; }
         public float Area { get => (float)( Math.PI*Radius*Radius ); }
         #endregion
 
         #region Geometry
-        public bool Contains(Vector3 point)
+        public bool Contains(Point3 point)
         {
             float z = Vector3.Dot(Normal, point-Center);
             if (Math.Abs(z)<=1e-11f)
             {
                 // Point is on plane
-                float d = Vector3.Distance(point, Center);
+                float d = Point3.Distance(point, Center);
 
                 return d<=Radius;
             }
             return false;
         }
-        public Vector3 ClosestPointTo(Vector3 point)
+        public Point3 ClosestPointTo(Point3 point)
         {
             float projNorm = Vector3.Dot(Normal, point - Center);
-            Vector3 projPoint = point - projNorm * Normal;
+            var projPoint = point - projNorm * Normal;
             Vector3 delta = projPoint - Center;
             if (delta.Length() == 0)
             {
@@ -87,9 +86,9 @@ namespace JA.Drawing.Geometry.Spatial
             return Center + Radius * dir;
         }
 
-        public float DistanceTo(Vector3 point)
+        public float DistanceTo(Point3 point)
         {
-            return Vector3.Distance(ClosestPointTo(point), point);
+            return Point3.Distance(ClosestPointTo(point), point);
         } 
         #endregion
 
@@ -105,18 +104,18 @@ namespace JA.Drawing.Geometry.Spatial
         public Circle3 Transform(Matrix4x4 transform)
         {
             return new Circle3(
-                Vector3.Transform(Center, transform), 
+                Point3.Transform(Center, transform), 
                 Vector3.TransformNormal(Normal, transform), 
                 Radius);
         }
         public Circle3 Rotate(Quaternion rotation)
         {
             return new Circle3(
-                Vector3.Transform(Center, rotation), 
+                Point3.Transform(Center, rotation), 
                 Vector3.Transform(Normal, rotation), 
                 Radius);
         }
-        public Circle3 Rotate(Quaternion rotation, Vector3 pivot)
+        public Circle3 Rotate(Quaternion rotation, Point3 pivot)
         {
             return new Circle3(
                 pivot + Vector3.Transform(Center - pivot, rotation), 

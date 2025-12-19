@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 using static System.Math;
 
-namespace JA.LinearAlgebra.Geometry.Spatial
+namespace JA.LinearAlgebra.Spatial
 {
     /// <summary>
     /// Polar and SVD decompositions of 3×3 matrices.

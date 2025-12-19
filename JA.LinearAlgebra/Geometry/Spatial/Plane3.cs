@@ -1,40 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
-
-using JA.LinearAlgebra.Geometry.Spatial;
 
 using static System.Math;
 
-//using Vector4 = System.Numerics.Vector4;
+using Vector3 = System.Numerics.Vector3;
+using Quaternion3 = System.Numerics.Quaternion;
 
-namespace JA.LinearAlgebra.Geometry.Homogeneous
+namespace JA.Geometry.Spatial
 {
-    using Vector3 = Vector3;
-    using Quaternion3 = Quaternion3;
 
     /// <summary>Represents a plane in three-dimensional space.</summary>
     public struct Plane3 : IEquatable<Plane3>
     {
-        private readonly (Vector3 normal, double d) data;
+        private readonly (Vector3 normal, float d) data;
 
         /// <summary>Creates a <see cref="T:System.Numerics.Plane" /> object from the X, Y, and Z components of its normal, and its distance from the origin on that normal.</summary>
         /// <param name="x">The X component of the normal.</param>
         /// <param name="y">The Y component of the normal.</param>
         /// <param name="z">The Z component of the normal.</param>
         /// <param name="d">The distance of the plane along its normal from the origin.</param>		
-        public Plane3(double x, double y, double z, double d)
+        public Plane3(float x, float y, float z, float d)
         {
 
             var normal = new Vector3(x, y, z);
-            double mag = normal.Magnitude;
+            float mag = normal.Length();
             if (mag>0)
             {
-                double factor = 1/mag;
+                float factor = 1/mag;
                 normal *= factor;
                 d *= factor;
             }
@@ -44,12 +39,12 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         /// <summary>Creates a <see cref="T:System.Numerics.Plane" /> object from a specified normal and the distance along the normal from the origin.</summary>
         /// <param name="normal">The plane's normal vector.</param>
         /// <param name="d">The plane's distance from the origin along its normal vector.</param>
-        public Plane3(Vector3 normal, double d)
+        public Plane3(Vector3 normal, float d)
         {
-            double mag = normal.Magnitude;
+            float mag = normal.Length();
             if (mag>0)
             {
-                double factor = 1/mag;
+                float factor = 1/mag;
                 normal *= factor;
                 d *= factor;
             }
@@ -81,12 +76,12 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         /// <summary>The normal vector of the plane.</summary>
         public Vector3 Normal => data.normal;
         /// <summary>The distance of the plane along its normal from the origin.</summary>
-        public double D => data.d;
+        public float D => data.d;
 
-        public bool IsFinite => data.normal.MagnitudeSquared>0;
+        public bool IsFinite => data.normal.LengthSquared()>0;
 
         /// <summary>The position vector of the point on the plane closest to the origin.</summary>
-        public Vector3 Position => data.d * data.normal/data.normal.MagnitudeSquared;
+        public Vector3 Position => data.d * data.normal/data.normal.LengthSquared();
 
         /// <summary>Creates a <see cref="T:System.Numerics.Plane" /> object that contains three specified points.</summary>
         /// <param name="point1">The first point defining the plane.</param>
@@ -98,9 +93,9 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         {
             Vector3 vector = point2 - point1;
             Vector3 vector2 = point3 - point1;
-            Vector3 value = Vector3.Cross(vector, vector2);
-            Vector3 vector3 = Vector3.Normalized(value);
-            double d = 0 - Vector3.Dot(vector3, point1);
+            var value = Vector3.Cross(vector, vector2);
+            var vector3 = Vector3.Normalize(value);
+            float d = 0 - Vector3.Dot(vector3, point1);
             return new Plane3(vector3, d);
         }
 
@@ -110,8 +105,8 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Plane3 Normalize(Plane3 value)
         {
-            double num = value.Normal.MagnitudeSquared;
-            double num2 = (double)Math.Sqrt(num);
+            float num = value.Normal.LengthSquared();
+            float num2 = (float)Sqrt(num);
             return new Plane3(value.Normal / num2, value.D / num2);
         }
 
@@ -128,7 +123,7 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         /// <param name="value">The four-dimensional vector.</param>
         /// <returns>The dot product.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Dot(Plane3 plane, System.Numerics.Vector4 value)
+        public static float Dot(Plane3 plane, System.Numerics.Vector4 value)
         {
             return plane.Normal.X * value.X + plane.Normal.Y * value.Y + plane.Normal.Z * value.Z + plane.D * value.W;
         }
@@ -138,7 +133,7 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         /// <param name="value">The 3-dimensional vector.</param>
         /// <returns>The dot product.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double DotCoordinate(Plane3 plane, Vector3 value)
+        public static float DotCoordinate(Plane3 plane, Vector3 value)
         {
             return Vector3.Dot(plane.Normal, value) + plane.D;
         }
@@ -148,7 +143,7 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         /// <param name="value">The three-dimensional vector.</param>
         /// <returns>The dot product.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double DotNormal(Plane3 plane, Vector3 value)
+        public static float DotNormal(Plane3 plane, Vector3 value)
         {
             return Vector3.Dot(plane.Normal, value);
         }
@@ -222,7 +217,7 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
             unchecked
             {
                 int hc = -1817952719;
-                hc = (-1521134295)*hc + data.GetHashCode();
+                hc = -1521134295*hc + data.GetHashCode();
                 return hc;
             }
         }
@@ -234,7 +229,7 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
             => new Plane3(
                 -a.Normal,
                 -a.D);
-        public static Plane3 Scale(double factor, Plane3 a)
+        public static Plane3 Scale(float factor, Plane3 a)
             => new Plane3(
                 factor*a.Normal,
                 factor*a.D);
@@ -250,19 +245,19 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         public static Plane3 operator +(Plane3 a, Plane3 b) => Add(a, b);
         public static Plane3 operator -(Plane3 a) => Negate(a);
         public static Plane3 operator -(Plane3 a, Plane3 b) => Subtract(a, b);
-        public static Plane3 operator *(double f, Plane3 a) => Scale(f, a);
-        public static Plane3 operator *(Plane3 a, double f) => Scale(f, a);
-        public static Plane3 operator /(Plane3 a, double d) => Scale(1/d, a);
+        public static Plane3 operator *(float f, Plane3 a) => Scale(f, a);
+        public static Plane3 operator *(Plane3 a, float f) => Scale(f, a);
+        public static Plane3 operator /(Plane3 a, float d) => Scale(1/d, a);
         #endregion
 
         #region Geometry
         public Point3 Center 
             => new Point3(
                 -data.d*data.normal, 
-                data.normal.MagnitudeSquared);
+                data.normal.LengthSquared());
 
-        public double Distance
-            => Abs(D)/Normal.Magnitude;
+        public float Distance
+            => Abs(D)/Normal.Length();
 
         public static Plane3 FromThreePoints(Point3 A, Point3 B, Point3 C)
         {
@@ -285,17 +280,17 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         public static Plane3 FromLineAwayFromOrigin(Line3 line)
             => new Plane3(
                 Vector3.Cross(line.Moment, line.Vector), 
-                line.Moment.MagnitudeSquared);
+                line.Moment.LengthSquared());
 
         public static Plane3 FromPointAwayFromOrigin(Point3 point)
             => new Plane3(
                 -point.W*point.Vector, point.W*point.W);
 
-        public double DistanceTo(Point3 point)
+        public float DistanceTo(Point3 point)
             => Abs(Vector3.Dot(Normal, point.Vector) + D*point.W)
-            /(point.W*Normal).Magnitude;
+            /(point.W*Normal).Length();
 
-        public double DistanceTo(Line3 line) => line.DistanceTo(this);
+        public float DistanceTo(Line3 line) => line.DistanceTo(this);
 
         #endregion
 
@@ -315,10 +310,10 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         public static Line3 operator ^(Plane3 plane1, Plane3 plane2)
             => Line3.FromTwoPlanes(plane1, plane2);
 
-        public static double operator *(Plane3 plane, Point3 point)
+        public static float operator *(Plane3 plane, Point3 point)
             => Vector3.Dot(point.Vector, plane.Normal) + point.W*plane.D;
 
-        public static double operator *(Plane3 plane, Line3 line)
+        public static float operator *(Plane3 plane, Line3 line)
             => line * plane;
 
 

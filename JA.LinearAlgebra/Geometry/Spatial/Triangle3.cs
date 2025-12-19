@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Drawing;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Linq;
 
-namespace JA.Drawing.Geometry.Spatial
-{
-    using JA.LinearAlgebra;
+using Color = System.Drawing.Color;
 
+namespace JA.Geometry.Spatial
+{
     public readonly struct Triangle3 : ICanConvertUnits<Triangle3>
     {
         public const float ZERO_TOL = 1e-6f;
-        public Triangle3(params Vector3[] nodes) : this()
+        public Triangle3(params Point3[] nodes) : this()
         {
             if (nodes.Length != 3)
             {
@@ -21,17 +20,17 @@ namespace JA.Drawing.Geometry.Spatial
             B = nodes[1];
             C = nodes[2];
         }
-        public Triangle3(Vector3 a, Vector3 b, Vector3 c) : this()
+        public Triangle3(Point3 a, Point3 b, Point3 c) : this()
         {
             A = a;
             B = b;
             C = c;
         }
 
-        public Vector3 A { get; }
-        public Vector3 B { get; }
-        public Vector3 C { get; }
-        public Vector3 Center { get => (A + B + C) / 3; }
+        public Point3 A { get; }
+        public Point3 B { get; }
+        public Point3 C { get; }
+        public Point3 Center { get => (A + B + C) / 3; }
         public Vector3 Normal { get => Vector3.Normalize(AreaVector); }
         public float Area { get => AreaVector.Length(); }
 
@@ -40,21 +39,27 @@ namespace JA.Drawing.Geometry.Spatial
         public LineSegment SideCA { get => new LineSegment(C, A); }
 
         private Vector3 AreaVector
-            => (Vector3.Cross(A, B)+ Vector3.Cross(B, C)+ Vector3.Cross(C, A)) / 2;
-
-        public Vector3 ClosestPointTo(Vector3 point)
         {
-            float d_A = Vector3.Distance(A, point);
-            float d_B = Vector3.Distance(B, point);
-            float d_C = Vector3.Distance(C, point);
+            get
+            {
+                Vector3 a = A.Position, b= B.Position, c = C.Position;
+                return ( Vector3.Cross(a, b)+Vector3.Cross(b, c)+Vector3.Cross(c, a) )/2;
+            }
+        }
 
-            Vector3 p_AB = SideAB.ClosestPointTo(point);
-            Vector3 p_BC = SideBC.ClosestPointTo(point);
-            Vector3 p_CA = SideCA.ClosestPointTo(point);
+        public Point3 ClosestPointTo(Point3 point)
+        {
+            float d_A = Point3.Distance(A, point);
+            float d_B = Point3.Distance(B, point);
+            float d_C = Point3.Distance(C, point);
 
-            float d_AB = Vector3.Distance(p_AB, point);
-            float d_BC = Vector3.Distance(p_BC, point);
-            float d_CA = Vector3.Distance(p_CA, point);
+            Point3 p_AB = SideAB.ClosestPointTo(point);
+            Point3 p_BC = SideBC.ClosestPointTo(point);
+            Point3 p_CA = SideCA.ClosestPointTo(point);
+
+            float d_AB = Point3.Distance(p_AB, point);
+            float d_BC = Point3.Distance(p_BC, point);
+            float d_CA = Point3.Distance(p_CA, point);
 
             float d = Math.Min(d_A, Math.Min(d_B, d_C));
             d = Math.Min(d, Math.Min(d_AB, Math.Min(d_BC, d_CA)));
@@ -69,23 +74,27 @@ namespace JA.Drawing.Geometry.Spatial
             throw new ArgumentException("Invalid Point", nameof(point));
         }
 
-        public float DistanceTo(Vector3 point)
+        public float DistanceTo(Point3 point)
         {
-            return Vector3.Distance(ClosestPointTo(point), point);
+            return Point3.Distance(ClosestPointTo(point), point);
         }
 
-        public Vector3 ProjectOnPlane(Vector3 point)
+        public Point3 ProjectOnPlane(Point3 point)
         {
             var n = Normal;
             var d = Vector3.Dot(n, point-A);
             return point - n*d;
         }
-        public bool Barycentric(Vector3 P, out (float w_A, float w_B, float w_C) coord)
+        public bool Barycentric(Point3 P, out (float w_A, float w_B, float w_C) coord)
         {
-            Vector3 n = Vector3.Cross(A, B)+ Vector3.Cross(B, C)+ Vector3.Cross(C, A);
-            float w_A = Vector3.Dot(n, Vector3.Cross(P, B)+ Vector3.Cross(B, C)+ Vector3.Cross(C, P));
-            float w_B = Vector3.Dot(n, Vector3.Cross(A, P)+ Vector3.Cross(P, C)+ Vector3.Cross(C, A));
-            float w_C = Vector3.Dot(n, Vector3.Cross(A, B)+ Vector3.Cross(B, P)+ Vector3.Cross(P, A));
+            Vector3 p = P.Position;
+            Vector3 a = A.Position;
+            Vector3 b = B.Position;
+            Vector3 c = C.Position;
+            Vector3 n = Vector3.Cross(a, b)+ Vector3.Cross(b, c)+ Vector3.Cross(c, a);
+            float w_A = Vector3.Dot(n, Vector3.Cross(p, b)+ Vector3.Cross(b, c)+ Vector3.Cross(c, p));
+            float w_B = Vector3.Dot(n, Vector3.Cross(a, p)+ Vector3.Cross(p, c)+ Vector3.Cross(c, a));
+            float w_C = Vector3.Dot(n, Vector3.Cross(a, b)+ Vector3.Cross(b, p)+ Vector3.Cross(p, a));
             float sum = w_A + w_B + w_C;
             if (sum != 0)
             {
@@ -96,14 +105,14 @@ namespace JA.Drawing.Geometry.Spatial
             return false;
         }
 
-        public Vector3 GetPoint(float w_A, float w_B, float w_C)
+        public Point3 GetPoint(float w_A, float w_B, float w_C)
             => GetPoint((w_A, w_B, w_C));
-        public Vector3 GetPoint((float w_A, float w_B, float w_C) coord)
+        public Point3 GetPoint((float w_A, float w_B, float w_C) coord)
         {
             return coord.w_A*A + coord.w_B*B + coord.w_C*C;
         }
 
-        public bool Contains(Vector3 point, float distanceTolerance = ZERO_TOL)
+        public bool Contains(Point3 point, float distanceTolerance = ZERO_TOL)
         {
             if (Math.Abs(Vector3.Dot(Normal, point-A))<= distanceTolerance)
             {
@@ -116,7 +125,7 @@ namespace JA.Drawing.Geometry.Spatial
         }
 
         #region Geometry
-        public Vector3[] GetNodes() => new Vector3[] { A, B, C };
+        public Point3[] GetNodes() => new Point3[] { A, B, C };
         public Triangle3 Scale(float factor)
         {
             return new Triangle3(GetNodes().Select((n) => factor*n).ToArray());
@@ -130,18 +139,18 @@ namespace JA.Drawing.Geometry.Spatial
             if (inverse)
             {
                 Matrix4x4.Invert(transform, out var inv);
-                return new Triangle3(GetNodes().Select((n) => Vector3.Transform(n, inv)).ToArray());
+                return new Triangle3(GetNodes().Select((n) => Point3.Transform(n, inv)).ToArray());
             }
-            return new Triangle3(GetNodes().Select((n) => Vector3.Transform(n, transform)).ToArray());
+            return new Triangle3(GetNodes().Select((n) => Point3.Transform(n, transform)).ToArray());
         }
         public Triangle3 Rotate(Quaternion rotation)
         {
             return new Triangle3(
-                Vector3.Transform( A, rotation), 
-                Vector3.Transform( B, rotation),
-                Vector3.Transform( C, rotation));
+                Point3.Transform( A, rotation), 
+                Point3.Transform( B, rotation),
+                Point3.Transform( C, rotation));
         }
-        public Triangle3 Rotate(Quaternion rotation, Vector3 pivot)
+        public Triangle3 Rotate(Quaternion rotation, Point3 pivot)
         {
             return new Triangle3(
                 pivot + Vector3.Transform( A - pivot, rotation), 
@@ -149,8 +158,8 @@ namespace JA.Drawing.Geometry.Spatial
                 pivot + Vector3.Transform( C - pivot, rotation));
         }
         public Triangle3 Reflect(Plane plane)
-            => Reflect(plane.Normal, -plane.Normal * plane.D);
-        public Triangle3 Reflect(Vector3 normal, Vector3 origin)
+            => Reflect(plane.Normal, new Point3( -plane.Normal * plane.D, 1));
+        public Triangle3 Reflect(Vector3 normal, Point3 origin)
             => new Triangle3(
                 origin + Vector3.Reflect(A - origin, normal),
                 origin + Vector3.Reflect(B - origin, normal),

@@ -7,16 +7,32 @@ using static System.Math;
 namespace JA.Drawing
 {
     using Vector2 = System.Numerics.Vector2;
+    using JA.Geometry.Planar;
 
-    using JA.Drawing.Geometry.Planar;
+    public interface IFrame
+    {
+        Size ClientSize { get; }
+        PointF DrawOrigin { get; }
+        float DrawScale { get; }
+        PointF GetPixel(Point2 point);
+        PointF GetPixel(Vector2 coordinate);
+        PointF[] GetPixels(params Point2[] points);
+        PointF[] GetPixels(params Vector2[] coordinates);
+        Point2 GetPoint(PointF pixel);
+        Vector2 GetVector(PointF pixel);
+    }
 
-    public readonly struct Frame
+    public readonly struct Frame : IFrame
     {
         Frame(Size target, PointF origin, float scale)
         {
-            Target=target;
-            Scale=scale;
-            Origin=origin;
+            ClientSize=target;
+            DrawScale=scale;
+            DrawOrigin=origin;
+        }
+        public static Frame FromDraw(IDrawOnControl draw)
+        {
+            return CenteredWithScale(draw.ClientSize, draw.DrawScale);
         }
         public static Frame Empty { get; } = new Frame(Size.Empty, PointF.Empty, 0f);
         public static Frame CenteredWithSize(Size target, float size)
@@ -50,18 +66,18 @@ namespace JA.Drawing
             return new Frame(target, origin, scale);
         }
 
-        public Size Target { get; }
-        public float Scale { get; }
-        public PointF Origin { get; }
+        public Size ClientSize { get; }
+        public float DrawScale { get; }
+        public PointF DrawOrigin { get; }
 
         public Point2 TopLeft => Point2.FromVector(
             GetVector(new PointF(0, 0)));
         public Point2 TopRight => Point2.FromVector(
-            GetVector(new PointF(Target.Width-1, 0)));
+            GetVector(new PointF(ClientSize.Width-1, 0)));
         public Point2 BottomLeft => Point2.FromVector(
-            GetVector(new PointF(0, Target.Height-1)));
+            GetVector(new PointF(0, ClientSize.Height-1)));
         public Point2 BottomRight => Point2.FromVector(
-            GetVector(new PointF(Target.Width-1, Target.Height-1)));
+            GetVector(new PointF(ClientSize.Width-1, ClientSize.Height-1)));
 
         #region Conversions
         public PointF GetPixel(Point2 point)
@@ -69,11 +85,11 @@ namespace JA.Drawing
 
         public PointF GetPixel(Vector2 coordinate)
         {
-            var origin = Origin;
+            var origin = DrawOrigin;
 
             return new PointF(
-                origin.X+Scale*coordinate.X,
-                origin.Y-Scale*coordinate.Y);
+                origin.X+DrawScale*coordinate.X,
+                origin.Y-DrawScale*coordinate.Y);
         }
 
         public PointF[] GetPixels(params Point2[] points)
@@ -81,33 +97,33 @@ namespace JA.Drawing
 
         public PointF[] GetPixels(params Vector2[] coordinates)
         {
-            var origin = Origin;
+            var origin = DrawOrigin;
 
             var points = new PointF[coordinates.Length];
             for (var i = 0; i<points.Length; i++)
             {
                 points[i]=new PointF(
-                origin.X+Scale*coordinates[i].X,
-                origin.Y-Scale*coordinates[i].Y);
+                origin.X+DrawScale*coordinates[i].X,
+                origin.Y-DrawScale*coordinates[i].Y);
             }
             return points;
         }
         public Point2 GetPoint(PointF pixel)
         {
-            var origin = Origin;
+            var origin = DrawOrigin;
 
             return new Point2(
-                ( pixel.X-origin.X )/Scale,
-                -( pixel.Y-origin.Y )/Scale,
+                ( pixel.X-origin.X )/DrawScale,
+                -( pixel.Y-origin.Y )/DrawScale,
                 1);
         }
         public Vector2 GetVector(PointF pixel)
         {
-            var origin = Origin;
+            var origin = DrawOrigin;
 
             return new Vector2(
-                ( pixel.X-origin.X )/Scale,
-                -( pixel.Y-origin.Y )/Scale);
+                ( pixel.X-origin.X )/DrawScale,
+                -( pixel.Y-origin.Y )/DrawScale);
         }
         #endregion
     }

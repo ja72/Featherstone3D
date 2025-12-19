@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-using JA.LinearAlgebra;
-
-namespace JA.Drawing.Geometry.Spatial
+namespace JA.Geometry.Spatial
 {
     public readonly struct Polygon3 
     {
-        public Polygon3(params Vector3[] nodes)
+        public Polygon3(params Point3[] nodes)
         {
             Nodes=nodes;
 
@@ -25,15 +23,15 @@ namespace JA.Drawing.Geometry.Spatial
             }
         }
 
-        public Vector3[] Nodes { get; }
+        public Point3[] Nodes { get; }
         public bool IsConvex { get; }
 
-        public Vector3 Center
+        public Point3 Center
         {
             get
             {
                 int count = Nodes.Length;
-                return Nodes.Aggregate(Vector3.Zero, (cen, node) => cen+node/count);
+                return Nodes.Aggregate(Point3.Empty, (cen, node) => cen+node.Position/count);
             }
         }
 
@@ -78,7 +76,7 @@ namespace JA.Drawing.Geometry.Spatial
             return list.ToArray();
         }
 
-        static bool CheckConvex(Vector3[] nodes)
+        static bool CheckConvex(Point3[] nodes)
         {
             for (int i = 0; i < nodes.Length; i++)
             {
@@ -111,15 +109,15 @@ namespace JA.Drawing.Geometry.Spatial
             if (inverse)
             {
                 Matrix4x4.Invert(transform, out var inv);
-                return new Polygon3(Nodes.Select((n) => Vector3.Transform(n, inv)).ToArray());
+                return new Polygon3(Nodes.Select((n) => Point3.Transform(n, inv)).ToArray());
             }
-            return new Polygon3(Nodes.Select((n) => Vector3.Transform(n, transform)).ToArray());
+            return new Polygon3(Nodes.Select((n) => Point3.Transform(n, transform)).ToArray());
         }
         public Polygon3 Rotate(Quaternion rotation)
         {
-            return new Polygon3(Nodes.Select((n) => Vector3.Transform(n, rotation)).ToArray());
+            return new Polygon3(Nodes.Select((n) => Point3.Transform(n, rotation)).ToArray());
         }
-        public Polygon3 Rotate(Quaternion rotation, Vector3 pivot)
+        public Polygon3 Rotate(Quaternion rotation, Point3 pivot)
         {
             return new Polygon3(Nodes.Select((n) => pivot + Vector3.Transform(n - pivot, rotation)).ToArray());
         }

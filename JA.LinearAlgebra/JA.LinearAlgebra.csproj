@@ -44,30 +44,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Drawing\Geometry\DrawControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Drawing\Geometry\DrawControl.Designer.cs">
-      <DependentUpon>DrawControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Drawing\Geometry\CanvasRendering.cs" />
-    <Compile Include="Drawing\Geometry\DrawRendering.cs" />
+    <Compile Include="Drawing\DrawOnControl.cs" />
+    <Compile Include="Drawing\DrawRendering.cs" />
     <Compile Include="LinearAlgebra\Factory.cs" />
-    <Compile Include="Drawing\Geometry\Planar\Circle2.cs" />
-    <Compile Include="Drawing\Geometry\Spatial\Circle3.cs" />
-    <Compile Include="Drawing\Geometry\Planar\Ellipse2.cs" />
-    <Compile Include="Drawing\Geometry\Planar\Geometry.cs" />
-    <Compile Include="LinearAlgebra\Geometry\Spatial\Line3.cs" />
-    <Compile Include="Drawing\Geometry\Planar\Line2.cs" />
-    <Compile Include="Drawing\Geometry\Spatial\LineSegment.cs" />
-    <Compile Include="Drawing\Geometry\Spatial\Mesh3.cs" />
-    <Compile Include="LinearAlgebra\Geometry\Spatial\Plane3.cs" />
-    <Compile Include="LinearAlgebra\Geometry\Spatial\Point3.cs" />
-    <Compile Include="Drawing\Geometry\Planar\Point2.cs" />
-    <Compile Include="Drawing\Geometry\Spatial\Polygon3.cs" />
-    <Compile Include="Drawing\Geometry\Spatial\Pose.cs" />
-    <Compile Include="Drawing\Geometry\Spatial\Triangle3.cs" />
-    <Compile Include="Drawing\Geometry\Canvas.cs" />
+    <Compile Include="Geometry\Planar\Circle2.cs" />
+    <Compile Include="Geometry\Spatial\Circle3.cs" />
+    <Compile Include="Geometry\Planar\Ellipse2.cs" />
+    <Compile Include="Geometry\Planar\Geometry.cs" />
+    <Compile Include="Geometry\Spatial\Line3.cs" />
+    <Compile Include="Geometry\Planar\Line2.cs" />
+    <Compile Include="Geometry\Spatial\LineSegment.cs" />
+    <Compile Include="Geometry\Spatial\Mesh3.cs" />
+    <Compile Include="Geometry\Spatial\Plane3.cs" />
+    <Compile Include="Geometry\Spatial\Point3.cs" />
+    <Compile Include="Geometry\Planar\Point2.cs" />
+    <Compile Include="Geometry\Spatial\Polygon3.cs" />
+    <Compile Include="Geometry\Spatial\Pose.cs" />
+    <Compile Include="Geometry\Spatial\Triangle3.cs" />
     <Compile Include="Drawing\Frame.cs" />
     <Compile Include="Drawing\DrawGraphics.cs" />
     <Compile Include="Drawing\DrawStyles.cs" />
@@ -82,19 +75,17 @@
     <Compile Include="LinearAlgebra\StackedMatrix.cs" />
     <Compile Include="LinearAlgebra\StackedVector.cs" />
     <Compile Include="LinearAlgebra\Vector.cs" />
-    <Compile Include="LinearAlgebra\Geometry\Spatial\Decompositions.cs" />
-    <Compile Include="LinearAlgebra\Geometry\Spatial\Matrix3.cs" />
-    <Compile Include="LinearAlgebra\Geometry\Spatial\Pose3.cs" />
-    <Compile Include="LinearAlgebra\Geometry\Spatial\Quaternion3.cs" />
-    <Compile Include="LinearAlgebra\Geometry\Spatial\Vector3.cs" />
+    <Compile Include="LinearAlgebra\Spatial\Decompositions.cs" />
+    <Compile Include="LinearAlgebra\Spatial\Matrix3.cs" />
+    <Compile Include="LinearAlgebra\Spatial\Pose3.cs" />
+    <Compile Include="LinearAlgebra\Spatial\Quaternion3.cs" />
+    <Compile Include="LinearAlgebra\Spatial\Vector3.cs" />
     <Compile Include="Materials.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Symbolics\Expr.cs" />
     <Compile Include="Units.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="LinearAlgebra\Geometry\Planar\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

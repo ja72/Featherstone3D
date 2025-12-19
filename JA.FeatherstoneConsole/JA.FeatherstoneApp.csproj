@@ -139,12 +139,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="UI\KryptonDrawControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="UI\KryptonDrawControl.Designer.cs">
-      <DependentUpon>KryptonDrawControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="UI\FeatherstoneForm.cs">
       <SubType>Form</SubType>
     </Compile>

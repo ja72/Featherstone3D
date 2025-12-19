@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JA.Drawing.Geometry.Spatial
+namespace JA.Geometry.Spatial
 {
     public class Pose
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JA.LinearAlgebra.Geometry.Spatial
+namespace JA.LinearAlgebra.Spatial
 {
     public readonly struct Pose3 : ICanConvertUnits<Pose3>
     {

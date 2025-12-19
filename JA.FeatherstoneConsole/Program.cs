@@ -5,14 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Drawing;
+using JA.LinearAlgebra.Spatial;
 
 namespace JA
 {
     using JA.LinearAlgebra;
-    using JA.Drawing.Geometry.Spatial;
 
-    using Vector3 = JA.LinearAlgebra.Geometry.Spatial.Vector3;
-    using Matrix3 = JA.LinearAlgebra.Geometry.Spatial.Matrix3;
+    using Vector3 = Vector3;
+    using Matrix3 = Matrix3;
 
     using Expr = JA.Symbolics.Expr;
     using World = JA.Dynamics.World;
@@ -21,6 +21,7 @@ namespace JA
     using MotorDefined = JA.Dynamics.MotorDefined;
     using System.Windows.Forms;
     using JA.UI;
+    using JA.Geometry.Spatial;
 
     internal class Program
     {
@@ -221,7 +222,7 @@ namespace JA
         {
             const string filePath = @"Models\LINK.STL";
 
-            var origin = new System.Numerics.Vector3(0,0,10.5567f);
+            var origin = Point3.FromPosition(0,0,10.5567f);
             if (Mesh3.ImportSTL(UnitSystem.MMGS, filePath, Color.AliceBlue, out var link, origin))
             {
                 Console.WriteLine(link);

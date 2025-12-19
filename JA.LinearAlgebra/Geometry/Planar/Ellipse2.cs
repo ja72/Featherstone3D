@@ -8,7 +8,7 @@ using JA.LinearAlgebra;
 
 using static System.Math;
 
-namespace JA.Drawing.Geometry.Planar
+namespace JA.Geometry.Planar
 {
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public readonly struct Ellipse2 :

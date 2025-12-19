@@ -4,12 +4,11 @@ using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-using JA.LinearAlgebra.Geometry;
 using JA.LinearAlgebra.Screws;
 
 using static System.Math;
 
-namespace JA.LinearAlgebra.Geometry.Spatial
+namespace JA.LinearAlgebra.Spatial
 {
 
     public enum Axis
@@ -71,16 +70,16 @@ namespace JA.LinearAlgebra.Geometry.Spatial
             => FromCylindrical(axis, reference, radius, theta, 0);
         public static Vector3 FromCylindrical(Vector3 axis, Vector3 reference, double radius, double azimuth, double z)
         {
-            Vector3 y = Cross(axis, reference).Normalize();
-            Vector3 x = Cross(y, axis).Normalize();
+            Vector3 y = Cross(axis, reference).ToNormalized();
+            Vector3 x = Cross(y, axis).ToNormalized();
             double a_sin = Sin(azimuth);
             double a_cos = Cos(azimuth);
             return radius*a_cos*x+radius*a_sin*y+z*axis;
         }
         public static Vector3 FromSpherical(Vector3 axis, Vector3 reference, double radius, double elevation, double azimuth)
         {
-            Vector3 y = Cross(axis, reference).Normalize();
-            Vector3 x = Cross(y, axis).Normalize();
+            Vector3 y = Cross(axis, reference).ToNormalized();
+            Vector3 x = Cross(y, axis).ToNormalized();
             var e_sin = Sin(elevation);
             var e_cos = Cos(elevation);
             return radius*e_cos*Cos(azimuth)*x
@@ -91,7 +90,7 @@ namespace JA.LinearAlgebra.Geometry.Spatial
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 Relative(Vector3 from, Vector3 to) => to-from;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3 Direction(Vector3 from, Vector3 to) => Normalized(to-from);
+        public static Vector3 Direction(Vector3 from, Vector3 to) => Normalize(to-from);
 
         public static Vector3 FromVector(System.Numerics.Vector3 v)
             => new Vector3(v.X, v.Y, v.Z);
@@ -105,7 +104,8 @@ namespace JA.LinearAlgebra.Geometry.Spatial
         #region Properties
         public double MagnitudeSquared => x*x+y*y+z*z;
         public double Magnitude => Sqrt(MagnitudeSquared);
-
+        public double Length() => Magnitude;
+        public double LengthSquared() => MagnitudeSquared;
         public double X => this.x;
 
         public double Y => this.y;
@@ -170,7 +170,7 @@ namespace JA.LinearAlgebra.Geometry.Spatial
 
         public static double MaxAbs(Vector3 a) 
             => Max(Abs(a.x), Max(Abs(a.y), Abs(a.z)));
-        public Vector3 Normalize() => Normalized(this);
+        public Vector3 ToNormalized() => Normalize(this);
 
         public bool TryNormalize(out Vector3 result)
         {
@@ -189,7 +189,7 @@ namespace JA.LinearAlgebra.Geometry.Spatial
             return true;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3 Normalized(Vector3 v)
+        public static Vector3 Normalize(Vector3 v)
         {
             var len = v.Magnitude;
             if (len==0.0) return Zero;

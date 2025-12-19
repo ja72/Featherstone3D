@@ -17,8 +17,18 @@ namespace JA.LinearAlgebra
 
         public static float UlpFloat { get; } = 1f/8388608;             //2^-23
         public static double UlpDouble { get; } = 1d/2251799813685248L; //2^-51
+        public static double UlpTrig { get; } = 1d/68719476736L;        //2^-36
 
         #region Single
+        public static float Eps(float magnitude)
+        {
+            magnitude=Abs(magnitude);
+            float x = 1;
+            while (magnitude + x != magnitude)
+                x /= 2;
+            return x*2;
+        }
+
         public static bool GaussPointIteration(this Func<float, float> f, float x_init, float tol, out float x)
         {
             x = x_init;
@@ -95,6 +105,58 @@ namespace JA.LinearAlgebra
         #endregion
 
         #region Double
+
+        public static double Eps(double magnitude)
+        {
+            magnitude=Abs(magnitude);
+            double x = 1;
+            while (magnitude + x != magnitude)
+                x /= 2;
+            return x*2;
+        }
+
+        public static double CubicRoot(this double x)
+        {
+            return x >= 0 ? Pow(x, 1.0 / 3.0) : -Pow(-x, 1.0 / 3.0);
+        }
+        /// <summary>
+        /// Solves the cubic <code>x^3 + a*x^2 + b*x + c = 0</code>
+        /// </summary>
+        /// <param name="roots">The roots of the cubic</param>
+        public static bool SolveCubic(double a, double b, double c, out double[] roots)
+        {
+            //Solves x^3 + a*x^2 + b*x + c = 0
+            double p = b - a * a / 3;
+            double q = 2 * a * a * a / 27 - a * b / 3 + c;
+            double discriminant = q * q / 4 + p * p * p / 27;
+            if (discriminant > 0)
+            {
+                double u = CubicRoot(-q / 2 + Sqrt(discriminant));
+                double v = CubicRoot(-q / 2 - Sqrt(discriminant));
+                roots = new double[] { u + v - a / 3 };
+                return false;
+            }
+            else if (Abs(discriminant) < UlpDouble)
+            {
+                double u = CubicRoot(-q / 2);
+                roots = new double[] { 2 * u - a / 3, -u - a / 3 };
+                return true;
+            }
+            else
+            {
+                double r = Sqrt(-p * p * p / 27);
+                double phi = Acos(-q / (2 * r));
+                double t = 2 * CubicRoot(r);
+                roots = new double[]
+                {
+                    t * Cos(phi / 3) - a / 3,
+                    t * Cos((phi + 2 * PI) / 3) - a / 3,
+                    t * Cos((phi + 4 * PI) / 3) - a / 3
+                };
+                return true;
+            }
+        }
+
         public static bool GaussPointIteration(this Func<double, double> f, double x_init, double tol, out double x)
         {
             x = x_init;

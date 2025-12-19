@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-using JA.LinearAlgebra.Geometry.Spatial;
+using JA.LinearAlgebra.Spatial;
 
 using static System.Math;
 

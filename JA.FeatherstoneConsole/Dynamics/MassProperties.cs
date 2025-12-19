@@ -6,22 +6,20 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-using JA.Drawing.Geometry.Spatial;
-using JA.LinearAlgebra.Geometry.Spatial;
-using JA.LinearAlgebra.Screws;
+using Vec3f = System.Numerics.Vector3;
 
+using Vector3 = JA.LinearAlgebra.Spatial.Vector3;
+using Matrix3 = JA.LinearAlgebra.Spatial.Matrix3;
+using Quaternion3 = JA.LinearAlgebra.Spatial.Quaternion3;
+using Pose3 = JA.LinearAlgebra.Spatial.Pose3;
+using Mesh3 = JA.Geometry.Spatial.Mesh3;
+
+using Vector33 = JA.LinearAlgebra.Screws.Vector33;
+using Matrix33 = JA.LinearAlgebra.Screws.Matrix33;
+using Wrench3 = JA.LinearAlgebra.Screws.Wrench3;
 
 namespace JA.Dynamics
 {
-    using Vector3 = Vector3;
-    using Matrix3 = Matrix3;
-    using Quaternion3 = Quaternion3;
-    using Pose3 = Pose3;
-    using Mesh3 = Mesh3;
-
-    using Vector33 = JA.LinearAlgebra.Screws.Vector33;
-    using Matrix33 = JA.LinearAlgebra.Screws.Matrix33;
-
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public readonly struct MassProperties :
         ICanChangeUnits<MassProperties>,
@@ -129,7 +127,7 @@ namespace JA.Dynamics
             center = Vector3.Zero;
             specificMmoi = Matrix3.Zero;
             float dV;
-            System.Numerics.Vector3 dc;
+            Vec3f dc;
             Matrix3 dI;
             for (int index = 0; index < mesh.ElementList.Count; index++)
             {
@@ -137,14 +135,14 @@ namespace JA.Dynamics
                 
                 foreach (var triangle in triangles)
                 {
-                    dV = System.Numerics.Vector3.Dot(
-                        triangle.A, 
-                            System.Numerics.Vector3.Cross(triangle.B, triangle.C)) / 6;
+                    dV = Vec3f.Dot(
+                        triangle.A.Position,
+                        Vec3f.Cross(triangle.B.Position, triangle.C.Position)) / 6;
 
-                    dc = (triangle.A + triangle.B + triangle.C) / 4;
-                    var AB = Vector3.FromVector(triangle.A+triangle.B);
-                    var BC = Vector3.FromVector(triangle.B+triangle.C);
-                    var CA = Vector3.FromVector(triangle.C+triangle.A);
+                    dc = (triangle.A.Position + triangle.B.Position + triangle.C.Position) / 4;
+                    var AB = Vector3.FromVector(triangle.A.Position+triangle.B.Position);
+                    var BC = Vector3.FromVector(triangle.B.Position+triangle.C.Position);
+                    var CA = Vector3.FromVector(triangle.C.Position+triangle.A.Position);
                     var ABAB = AB.MomentTensor();
                     var BCBC = BC.MomentTensor();
                     var CACA = CA.MomentTensor();

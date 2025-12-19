@@ -6,7 +6,7 @@ using JA.LinearAlgebra.Screws;
 
 using static System.Math;
 
-namespace JA.LinearAlgebra.Geometry.Spatial
+namespace JA.LinearAlgebra.Spatial
 {
 
     /// <summary>

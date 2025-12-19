@@ -3,7 +3,7 @@ using System.Numerics;
 
 using static System.Math;
 
-namespace JA.Drawing.Geometry.Planar
+namespace JA.Geometry.Planar
 {
     public enum CornerSolution
     {

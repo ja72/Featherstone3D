@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 using static System.Math;
 
-namespace JA.Drawing.Geometry.Planar
+namespace JA.Geometry.Planar
 {
     public readonly struct Line2 :
         IEquatable<Line2>,

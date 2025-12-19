@@ -3,14 +3,13 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Xml;
 
-using JA.LinearAlgebra.Geometry.Spatial;
+using Vector3 = System.Numerics.Vector3;
+using Quaternion3 = System.Numerics.Quaternion;
 
 using static System.Math;
 
-namespace JA.LinearAlgebra.Geometry.Homogeneous
+namespace JA.Geometry.Spatial
 {
-    using Quaternion3 = Quaternion3;
-    using Vector3 = Vector3;
 
     public struct Line3 : IEquatable<Line3>
     {
@@ -18,10 +17,10 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
 
         public Line3(Vector3 direction, Vector3 moment)
         {
-            double mag = direction.Magnitude;
+            float mag = direction.Length();
             if(mag > 0)
             {
-                double factor = 1/mag;
+                float factor = 1/mag;
                 direction *= factor;
                 moment *= factor;
             }
@@ -38,9 +37,9 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
 
         public Vector3 Vector => data.direction;
         public Vector3 Moment => data.moment;
-        public bool IsFinite => Vector.MagnitudeSquared > 0;
+        public bool IsFinite => Vector.LengthSquared()> 0;
 
-        public Vector3 Direction => Vector3.Normalized(Vector);
+        public Vector3 Direction => Vector3.Normalize(Vector);
 
         /// <summary>Creates a new <see cref="Sng.Line3" /> object whose normal vector is the source plane's normal vector normalized.</summary>
         /// <param name="value">The source line.</param>
@@ -48,16 +47,16 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Line3 Normalize(Line3 value)
         {
-            var num = value.Vector.MagnitudeSquared;
+            var num = value.Vector.LengthSquared();
             if (num>0)
             {
-                var num2 = Math.Sqrt(num);
+                var num2 = (float)Sqrt(num);
                 return new Line3(value.Vector / num2, value.Moment / num2);
             }
-            var mom = value.Moment.MagnitudeSquared;
+            var mom = value.Moment.LengthSquared();
             if(mom>0)
             {
-                var mom2 = Math.Sqrt(mom);
+                var mom2 = (float)Sqrt(mom);
                 return new Line3(value.Vector / mom2, value.Moment / mom2);
             }
             return value;
@@ -69,9 +68,15 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         /// <returns>A new plane that results from applying the Quaternion rotation.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Line3 Transform(Line3 line, Quaternion3 rotation, bool inverse = false)
-        => new Line3(
-                Vector3.Transform(line.Vector, rotation, inverse),
-                Vector3.Transform(line.Moment, rotation, inverse));        
+        {
+            if (inverse)
+            {
+                rotation = Quaternion3.Inverse(rotation);
+            }
+            return new Line3(
+                        Vector3.Transform(line.Vector, rotation),
+                        Vector3.Transform(line.Moment, rotation));
+        }
 
         #region Formatting
         /// <summary>Returns the string representation of this point object.</summary>
@@ -85,7 +90,7 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         #region IEquatable Members
 
         /// <summary>
-        /// Equality overrides from <see cref="System.Object"/>
+        /// Equality overrides from <see cref="object"/>
         /// </summary>
         /// <param name="obj">The object to compare this with</param>
         /// <returns>False if object is a different type, otherwise it calls <code>ApproxEquals(Line)</code></returns>
@@ -115,7 +120,7 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
             unchecked
             {
                 int hc = -1817952719;
-                hc = (-1521134295)*hc + data.GetHashCode();
+                hc = -1521134295*hc + data.GetHashCode();
                 return hc;
             }
         }
@@ -135,7 +140,7 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
             => new Line3(
                 -a.Vector,
                 -a.Moment);
-        public static Line3 Scale(double factor, Line3 a)
+        public static Line3 Scale(float factor, Line3 a)
             => new Line3(
                 factor*a.Vector,
                 factor*a.Moment);
@@ -151,19 +156,19 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         public static Line3 operator +(Line3 a, Line3 b) => Add(a, b);
         public static Line3 operator -(Line3 a) => Negate(a);
         public static Line3 operator -(Line3 a, Line3 b) => Subtract(a, b);
-        public static Line3 operator *(double f, Line3 a) => Scale(f, a);
-        public static Line3 operator *(Line3 a, double f) => Scale(f, a);
-        public static Line3 operator /(Line3 a, double d) => Scale(1/d, a);
+        public static Line3 operator *(float f, Line3 a) => Scale(f, a);
+        public static Line3 operator *(Line3 a, float f) => Scale(f, a);
+        public static Line3 operator /(Line3 a, float d) => Scale(1/d, a);
         #endregion
 
         #region Geometry
         public Point3 Center 
             => new Point3(
                 Vector3.Cross(Vector, Moment), 
-                Vector.MagnitudeSquared);
+                Vector.LengthSquared());
 
-        public double Distance
-            => Moment.Magnitude/ Vector.Magnitude;
+        public float Distance
+            => Moment.Length()/ Vector.Length();
 
         public static Line3 FromPointAndDirection(Point3 point, Vector3 direction)
             => new Line3(
@@ -183,17 +188,17 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
                 Vector3.Cross(plane1.Normal, plane2.Normal),
                 plane1.D*plane2.Normal - plane2.D * plane1.Normal);
 
-        public double DistanceTo(Point3 point)
-            => (Vector3.Cross(Vector, point.Vector)+point.W*Moment).Magnitude
-            /(point.W*Vector).Magnitude;
+        public float DistanceTo(Point3 point)
+            => (Vector3.Cross(Vector, point.Vector)+point.W*Moment).Length()
+            /(point.W*Vector).Length();
 
-        public double DistanceTo(Plane3 plane)
-            => ( Vector3.Cross(Vector, plane.Normal) + plane.D * Moment ).Magnitude
-            /(plane.D*Vector).Magnitude;
+        public float DistanceTo(Plane3 plane)
+            => ( Vector3.Cross(Vector, plane.Normal) + plane.D * Moment ).Length()
+            /(plane.D*Vector).Length();
 
-        public double DistanceTo(Line3 line)
+        public float DistanceTo(Line3 line)
             => Abs(Vector3.Dot(Vector, line.Moment) + Vector3.Dot(Moment, line.Vector))
-            /Vector3.Cross(Vector, line.Vector).Magnitude;
+            /Vector3.Cross(Vector, line.Vector).Length();
 
         #endregion
 
@@ -220,11 +225,11 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         public static Plane3 operator &(Line3 line, Vector3 direction)
             => Plane3.FromLineAndDirection(line, direction);
 
-        public static double operator * (Line3 line, Point3 point)
-            => (Vector3.Cross(line.Vector, point.Vector)+point.W*line.Moment).Magnitude;
+        public static float operator * (Line3 line, Point3 point)
+            => (Vector3.Cross(line.Vector, point.Vector)+point.W*line.Moment).Length();
 
-        public static double operator * (Line3 line, Plane3 plane)
-            => (Vector3.Cross(line.Vector, plane.Normal)+plane.D*line.Moment).Magnitude;
+        public static float operator * (Line3 line, Plane3 plane)
+            => (Vector3.Cross(line.Vector, plane.Normal)+plane.D*line.Moment).Length();
 
         #endregion
 

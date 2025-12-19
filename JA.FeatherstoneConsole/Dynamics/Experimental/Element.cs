@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using JA.LinearAlgebra.Geometry.Spatial;
+using JA.LinearAlgebra.Spatial;
 
 namespace JA.Dynamics.Experimental
 {
@@ -46,7 +46,7 @@ namespace JA.Dynamics.Experimental
                 .AddRevolute(pinAxis);
         public Joint AddSliderFollower(Vector3 sliderAxis, Vector3 pinAxis, double offset)
         {
-            Vector3 side = Vector3.Cross(pinAxis, sliderAxis).Normalize();
+            Vector3 side = Vector3.Cross(pinAxis, sliderAxis).ToNormalized();
             return AddPrismatic(sliderAxis)
             .AddLink(side*offset)
             .AddRevolute(pinAxis);
@@ -55,16 +55,16 @@ namespace JA.Dynamics.Experimental
         public Joint AddPlanarJoint(Vector3 firstAxis, Vector3 secondAxis)
         {
             secondAxis=Vector3.Cross(Vector3.Cross(
-                firstAxis, secondAxis).Normalize(),
-                    firstAxis).Normalize();
+                firstAxis, secondAxis).ToNormalized(),
+                    firstAxis).ToNormalized();
             return AddPrismatic(firstAxis)
                 .AddPrismatic(secondAxis);
         }
 
         public Joint AddPlanarRevJoint(Vector3 firstAxis, Vector3 secondAxis)
         {
-            var revAxis = Vector3.Cross(firstAxis, secondAxis).Normalize();
-            secondAxis=Vector3.Cross(revAxis, firstAxis).Normalize();
+            var revAxis = Vector3.Cross(firstAxis, secondAxis).ToNormalized();
+            secondAxis=Vector3.Cross(revAxis, firstAxis).ToNormalized();
             return AddPrismatic(firstAxis)
                 .AddPrismatic(secondAxis)
                 .AddRevolute(revAxis);

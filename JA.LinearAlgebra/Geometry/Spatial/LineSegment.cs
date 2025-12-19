@@ -7,38 +7,40 @@ using System.Threading.Tasks;
 
 using static System.Math;
 
-namespace JA.Drawing.Geometry.Spatial
+namespace JA.Geometry.Spatial
 {
     public readonly struct LineSegment
     {
-        public LineSegment(Vector3 a, Vector3 b)
+        public LineSegment(Point3 a, Point3 b)
         {
             A=a;
             B=b;            
         }
 
-        public Vector3 A { get; }
-        public Vector3 B { get; }
-        public float Length { get => Vector3.Distance(A, B); }
+        public Point3 A { get; }
+        public Point3 B { get; }
+        public float Length { get => Point3.Distance(A, B); }
 
-        public Vector3 Direction { get => Vector3.Normalize(B-A); }
+        public Vector3 Direction { get => Point3.Direction(A, B);  }
 
         public LineSegment Flip() => new LineSegment(B, A);
 
-        public Vector3 GetPointAlong(float along)
-            => Vector3.Lerp(A, B, along);
+        public Point3 GetPointAlong(float along)
+            => Point3.Lerp(A, B, along);
 
 
-        public float ProjectPointAlong(Vector3 point)
+        public float ProjectPointAlong(Point3 point)
         {
-            float aa = Vector3.Dot(A, A), bb=Vector3.Dot(B,B), ab = Vector3.Dot(A,B);
+            Vector3 a = A.Position;
+            Vector3 b = B.Position;
+            float aa = Vector3.Dot(a, a), bb=Vector3.Dot(b, b), ab = Vector3.Dot(a, b);
 
-            return Min(1,Max(0,(aa-ab+Vector3.Dot(B-A, point))/(aa+bb-2*ab)));
+            return Min(1,Max(0,(aa-ab+Vector3.Dot(B-A, point.Position))/(aa+bb-2*ab)));
         }
 
-        public Vector3 ClosestPointTo(Vector3 point)=> GetPointAlong(ProjectPointAlong(point));
+        public Point3 ClosestPointTo(Point3 point)=> GetPointAlong(ProjectPointAlong(point));
 
-        public float DistanceTo(Vector3 point) => Vector3.Distance(point, ClosestPointTo(point));
+        public float DistanceTo(Point3 point) => Point3.Distance(point, ClosestPointTo(point));
 
         #region Algebra
         public LineSegment Offset(Vector3 delta)
@@ -54,28 +56,23 @@ namespace JA.Drawing.Geometry.Spatial
         public LineSegment Transform(Matrix4x4 transform)
         {
             return new LineSegment(
-                Vector3.Transform(A, transform), 
-                Vector3.Transform(B, transform));
+                Point3.Transform(A, transform), 
+                Point3.Transform(B, transform));
         }
         public LineSegment Rotate(Quaternion rotation)
         {
             return new LineSegment(
-                Vector3.Transform( A, rotation), 
-                Vector3.Transform( B, rotation));
+                Point3.Transform( A, rotation), 
+                Point3.Transform( B, rotation));
         }
-        public LineSegment Rotate(Quaternion rotation, Vector3 pivot)
+        public LineSegment Rotate(Quaternion rotation, Point3 pivot)
         {
             return new LineSegment(
                 pivot + Vector3.Transform( A - pivot, rotation), 
                 pivot + Vector3.Transform( B - pivot, rotation));
         }
-        public LineSegment Reflect(Vector3 normal)
-        {
-            return new LineSegment(
-                Vector3.Reflect(A, normal),
-                Vector3.Reflect(B, normal));
-        }
-        public LineSegment Reflect(Vector3 normal, Vector3 origin)
+        public LineSegment Reflect(Vector3 normal) => Reflect(normal, Point3.Origin);
+        public LineSegment Reflect(Vector3 normal, Point3 origin)
             => new LineSegment(
                 origin + Vector3.Reflect(A - origin, normal),
                 origin + Vector3.Reflect(B - origin, normal));

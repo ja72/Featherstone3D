@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices.ComTypes;
 
-namespace JA.Drawing.Geometry.Planar
+namespace JA.Geometry.Planar
 {
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public readonly struct Point2 :

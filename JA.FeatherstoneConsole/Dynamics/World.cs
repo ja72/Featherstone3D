@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace JA.Dynamics
 {
-    using JA.LinearAlgebra.Geometry.Spatial;
+    using JA.LinearAlgebra.Spatial;
 
     using Vector33 = JA.LinearAlgebra.Screws.Vector33;
     using Wrench3 = JA.LinearAlgebra.Screws.Wrench3;

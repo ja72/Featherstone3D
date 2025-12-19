@@ -2,26 +2,24 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-using JA.LinearAlgebra.Geometry.Spatial;
-
 using static System.Math;
 
-//using Vector4 = System.Numerics.Vector4;
+using Vector3 = System.Numerics.Vector3;
+using Quaternion3 = System.Numerics.Quaternion;
+using System.Numerics;
 
-namespace JA.LinearAlgebra.Geometry.Homogeneous
+namespace JA.Geometry.Spatial
 {
-    using Vector3 = Vector3;
-    using Quaternion3 = Quaternion3;
     public readonly struct Point3 : IEquatable<Point3>
     {
-        private readonly (Vector3 position, double w) data;
+        private readonly (Vector3 position, float w) data;
 
         /// <summary>Creates a <see cref="T:System.Numerics.Point" /> object from the X, Y, and Z components of its normal, and its distance from the origin on that normal.</summary>
         /// <param name="x">The X component of the position.</param>
         /// <param name="y">The Y component of the position.</param>
         /// <param name="z">The Z component of the position.</param>
         /// <param name="w">The weight of the point.</param>
-        public Point3(double x, double y, double z, double w)
+        public Point3(float x, float y, float z, float w)
         {
             if (w>0)
             {
@@ -33,20 +31,20 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         }
 
         /// <summary>Creates a <see cref="T:System.Numerics.Point" /> object from a specified normal and the distance along the normal from the origin.</summary>
-        /// <param name="position">The point's position vector.</param>
-        /// <param name="w">The weight of the point.</param>
-        public Point3(Vector3 position, double w)
+        /// <param name="vector">The point's position vector.</param>
+        /// <param name="weight">The weight of the point.</param>
+        public Point3(Vector3 vector, float weight)
         {
-            if (w>0)
+            if (weight>0)
             {
-                position /= w;
+                vector /= weight;
             }
-            data = (position, w);
+            data = (vector, weight);
         }
 
         /// <summary>Creates a <see cref="T:System.Numerics.Point" /> object from a specified four-dimensional vector.</summary>
         /// <param name="value">A vector whose first three elements describe the position vector, and whose <see cref="F:System.Numerics.Vector4.W" /> defines the weight of the point.</param>
-        public Point3(System.Numerics.Vector4 value)
+        public Point3(Vector4 value)
         {
             float w = value.W;
             if (w>0)
@@ -55,7 +53,16 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
             }
             data = (new Vector3(value.X, value.Y, value.Z), w);
         }
-
+        public static Point3 FromPosition(float x, float y, float z)
+            => new Point3(x, y, z, 1);
+        public static Point3 FromPosition(Vector3 position)
+            => new Point3(position.X, position.Y, position.Z, 1);
+        public static Point3 Lerp(Point3 a, Point3 b, float along)
+        {
+            Point3 p_a = ( 1-along )*a;
+            Point3 p_b = along*b;
+            return p_a + p_b;
+        }
         public static Point3 Empty { get; } = new Point3(Vector3.Zero, 0);
         public static Point3 Origin { get; } = new Point3(Vector3.Zero, 1);
         public static Point3 InfX { get; } = new Point3(Vector3.UnitX, 0);
@@ -65,7 +72,7 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         /// <summary>The vector part of the point.</summary>
         public Vector3 Vector => data.position;
         /// <summary>The weight of the point.</summary>
-        public double W => data.w;
+        public float W => data.w;
         public bool IsFinite => data.w*data.w > 0;
 
         /// <summary>The position vector of the point.</summary>
@@ -77,15 +84,19 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Point3 Normalize(Point3 value)
         {
-            const double tolsq = 1.1920929E-07f;
-            double w2 = value.W*value.W;
-            if (Math.Abs(w2 - 1f) < tolsq)
+            const float tolsq = 1.1920929E-07f;
+            float w2 = value.W*value.W;
+            if (Abs(w2 - 1f) < tolsq)
             {
                 return value;
             }
             return new Point3(value.Vector / value.W, 1f);
         }
-
+        /// <summary>
+        /// Direction vector from point A to point B
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3 Direction(Point3 A, Point3 B) => Vector3.Normalize(B-A);
         /// <summary>Transforms a normalized point by a Quaternion rotation.</summary>
         /// <param name="point">The normalized point to transform.</param>
         /// <param name="rotation">The Quaternion rotation to apply to the point.</param>
@@ -93,7 +104,12 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Point3 Transform(Point3 point, Quaternion3 rotation) 
             => new Point3(Vector3.Transform(point.Vector, rotation), point.W);
-
+        public static Point3 Transform(Point3 point, Matrix4x4 transform)
+        {
+            var v4 = new Vector4(point.Vector, point.W);
+            v4 = Vector4.Transform(v4, transform);
+            return new Point3(new Vector3(v4.X, v4.Y, v4.Z), v4.W);
+        }
         #region Geometric Algebra
 
         /// <summary>
@@ -111,10 +127,10 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         public static Line3 operator &(Point3 point1, Point3 point2)
             => Line3.FromTwoPoints(point1, point2);
 
-        public static double operator *(Point3 point, Plane3 plane)
+        public static float operator *(Point3 point, Plane3 plane)
             => Vector3.Dot(point.Vector, plane.Normal) + point.W*plane.D;
 
-        public static double operator *(Point3 point, Line3 line)
+        public static float operator *(Point3 point, Line3 line)
             => line * point;
 
         #endregion
@@ -187,7 +203,7 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
             unchecked
             {
                 int hc = -1817952719;
-                hc = (-1521134295)*hc + data.GetHashCode();
+                hc = -1521134295*hc + data.GetHashCode();
                 return hc;
             }
         }
@@ -195,11 +211,14 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         #endregion
 
         #region Algebra
-        public static Point3 Negate(Point3 a)
+        public static Point3 Offset(Point3 a, Vector3 dir)
             => new Point3(
-                -a.Vector,
-                -a.W);
-        public static Point3 Scale(double factor, Point3 a)
+                a.Vector + dir * a.W,
+                a.W);
+        public static Vector3 Delta(Point3 a, Point3 b)
+            => a.Vector / a.W - b.Vector / b.W;
+        public static Point3 Negate(Point3 a) => Scale(-1, a);
+        public static Point3 Scale(float factor, Point3 a)
             => new Point3(
                 factor*a.Vector,
                 factor*a.W);
@@ -207,17 +226,15 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
             => new Point3(
                 a.Vector+b.Vector,
                 a.W+b.W);
-        public static Point3 Subtract(Point3 a, Point3 b)
-            => new Point3(
-                a.Vector-b.Vector,
-                a.W-b.W);
-
+        public static Point3 operator +(Point3 a, Vector3 d) => Offset(a, d);
+        public static Point3 operator -(Point3 a, Vector3 d) => Offset(a, -d);
+        public static Vector3 operator -(Point3 a, Point3 b) => Delta(a, b);
+        public static Point3 operator-(Vector3 a, Point3 b)  => FromPosition( a - b.Position );
         public static Point3 operator +(Point3 a, Point3 b) => Add(a, b);
         public static Point3 operator -(Point3 a) => Negate(a);
-        public static Point3 operator -(Point3 a, Point3 b) => Subtract(a, b);
-        public static Point3 operator *(double f, Point3 a) => Scale(f, a);
-        public static Point3 operator *(Point3 a, double f) => Scale(f, a);
-        public static Point3 operator /(Point3 a, double d) => Scale(1/d, a);
+        public static Point3 operator *(float f, Point3 a) => Scale(f, a);
+        public static Point3 operator *(Point3 a, float f) => Scale(f, a);
+        public static Point3 operator /(Point3 a, float d) => Scale(1/d, a);
         #endregion
 
         #region Geometry        
@@ -228,20 +245,23 @@ namespace JA.LinearAlgebra.Geometry.Homogeneous
         {
             return A ^ B ^ C;
         }
+        public Point3 Reflect(Vector3 normal, Point3 origin)
+            => origin + Vector3.Reflect(this - origin, normal);
 
-        public double Distance
-            => Vector.Magnitude/Abs(W);
+        public float DistanceFromOrigin()
+            => Vector.Length()/Abs(W);
 
         public static Point3 FromLineAndPlane(Line3 line, Plane3 plane)
             => new Point3(
                 Vector3.Cross(plane.Normal, line.Moment) - plane.D * line.Vector, 
                 Vector3.Dot(plane.Normal, line.Vector));
 
-        public double DistanceTo(Plane3 plane)
+        public float DistanceTo(Plane3 plane)
             => Abs(Vector3.Dot(plane.Normal, Vector) + plane.D*W)
-            /( W*plane.Normal ).Magnitude;
+            /( W*plane.Normal ).Length();
 
-        public double DistanceTo(Line3 line) => line.DistanceTo(this);
+        public float DistanceTo(Line3 line) => line.DistanceTo(this);
+        public static float Distance(Point3 point, Point3 center) => Delta(point, center).Length();
 
         #endregion
 

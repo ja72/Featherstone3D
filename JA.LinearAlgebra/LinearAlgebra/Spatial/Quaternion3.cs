@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace JA.LinearAlgebra.Geometry.Spatial
+namespace JA.LinearAlgebra.Spatial
 {
     /// <summary>
     /// Immutable quaternion using double precision. 
@@ -109,7 +109,7 @@ namespace JA.LinearAlgebra.Geometry.Spatial
             var half = 0.5 * angle;
             var s = Math.Sin(half);
             var c = Math.Cos(half);
-            var naxis = Vector3.Normalized(axis);
+            var naxis = Vector3.Normalize(axis);
             return new Quaternion3(c, naxis.X * s, naxis.Y * s, naxis.Z * s);
         }
 

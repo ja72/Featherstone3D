@@ -2,15 +2,14 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Drawing;
 using System.ComponentModel;
 using System.Numerics;
 
 using static System.Math;
 
-namespace JA.Drawing.Geometry.Spatial
+namespace JA.Geometry.Spatial
 {
-    using JA.LinearAlgebra;
+    using Color = System.Drawing.Color;
 
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class Face
@@ -36,28 +35,28 @@ namespace JA.Drawing.Geometry.Spatial
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class Mesh3 : ICanChangeUnits<Mesh3>
     {
-        readonly List<Vector3> nodeList;
+        readonly List<Point3> nodeList;
         readonly List<Face> faceList;
 
         #region Factory
         public Mesh3(UnitSystem units)
         {
             UnitSystem=units;
-            nodeList=new List<Vector3>();
+            nodeList=new List<Point3>();
             faceList=new List<Face>();
         }
 
         public Mesh3(Mesh3 copy)
         {
             UnitSystem=copy.UnitSystem;
-            nodeList=new List<Vector3>(copy.nodeList);
+            nodeList=new List<Point3>(copy.nodeList);
             faceList=new List<Face>(copy.faceList);
         }
 
-        Mesh3(UnitSystem units, IEnumerable<Vector3> nodeList, IEnumerable<Face> elementList) : this(units)
+        Mesh3(UnitSystem units, IEnumerable<Point3> nodeList, IEnumerable<Face> elementList) : this(units)
         {
             UnitSystem=units;
-            this.nodeList=new List<Vector3>(nodeList);
+            this.nodeList=new List<Point3>(nodeList);
             this.faceList=new List<Face>(elementList);
         }
         #endregion
@@ -76,27 +75,27 @@ namespace JA.Drawing.Geometry.Spatial
             return this;
         }
 
-        [Browsable(false)] public List<Vector3> NodeList => nodeList;
+        [Browsable(false)] public List<Point3> NodeList => nodeList;
         [Browsable(false)] public List<Face> ElementList => faceList;
 
-        public Vector3[] Nodes { get => nodeList.ToArray(); }
+        public Point3[] Nodes { get => nodeList.ToArray(); }
         [Browsable(false)]
         public Face[] Elements { get => faceList.ToArray(); }
         #endregion
 
         #region Structure
-        public void ApplyTranform(Vector3 origin)
+        public void ApplyTranform(Vector3 delta)
         {
             for (int i = 0; i<nodeList.Count; i++)
             {
-                nodeList[i]=origin+nodeList[i];
+                nodeList[i]+=delta;
             }
         }
-        public void ReverseTranform(Vector3 origin)
+        public void ReverseTranform(Vector3 delta)
         {
             for (int i = 0; i<nodeList.Count; i++)
             {
-                nodeList[i]=nodeList[i]=origin;
+                nodeList[i]-=delta;
             }
         }
         public void Tesselate(int level = 1)
@@ -129,7 +128,7 @@ namespace JA.Drawing.Geometry.Spatial
                     int j = (i+1) % nodes.Length;
                     nodeList.Add(( nodes[i]+nodes[j] )/2);
                 }
-                var center = nodes.Aggregate(Vector3.Zero, (a, b) => a + b) / nodes.Length;
+                var center = nodes.Aggregate(Point3.Empty, (a, b) => a + b) / nodes.Length;
                 nodeList.Add(center);
 
                 AddFace(color, face[0], k+0, k+4, k+3); // A
@@ -141,7 +140,7 @@ namespace JA.Drawing.Geometry.Spatial
             {
                 faceList.RemoveAt(index);
                 int k = nodeList.Count;
-                var center = nodes.Aggregate(Vector3.Zero, (a, b) => a + b) / nodes.Length;
+                var center = nodes.Aggregate(Point3.Empty, (a, b) => a + b) / nodes.Length;
                 nodeList.Add(center);
 
                 for (int i = 0; i<nodes.Length; i++)
@@ -157,7 +156,7 @@ namespace JA.Drawing.Geometry.Spatial
         /// Gets the local coordinates of the nodes of a face.
         /// </summary>
         /// <param name="faceIndex">The face index.</param>
-        public Vector3[] GetFaceNodes(int faceIndex)
+        public Point3[] GetFaceNodes(int faceIndex)
         {
             return faceList[faceIndex].NodeIndex.Select(ni => nodeList[ni]).ToArray();
         }
@@ -176,7 +175,7 @@ namespace JA.Drawing.Geometry.Spatial
         /// Gets the normal vectors of a face at each node, applying the mesh transformation.
         /// </summary>
         /// <param name="nodes">The nodes of the face.</param>
-        public Vector3[] GetNormals(Vector3[] nodes)
+        public Vector3[] GetNormals(Point3[] nodes)
         {
             var normals = new Vector3[nodes.Length];
             for (int i = 0; i<nodes.Length; i++)
@@ -184,7 +183,7 @@ namespace JA.Drawing.Geometry.Spatial
                 int j = (i + 1) % nodes.Length;
                 int k = (i - 1 + nodes.Length) % nodes.Length;
 
-                Vector3 A = nodes[i], B = nodes[j], C = nodes[k];
+                Vector3 A = nodes[i].Position, B = nodes[j].Position, C = nodes[k].Position;
 
                 normals[i]=Vector3.Normalize(
                     Vector3.Cross(A, B)
@@ -199,7 +198,7 @@ namespace JA.Drawing.Geometry.Spatial
         /// Gets the average normal vector of a face, applying the mesh transformation.
         /// </summary>
         /// <param name="nodes">The nodes of the face.</param>
-        public Vector3 GetNormal(Vector3[] nodes)
+        public Vector3 GetNormal(Point3[] nodes)
         {
             var list = GetNormals(nodes);
             Vector3 n = Vector3.Zero;
@@ -215,7 +214,7 @@ namespace JA.Drawing.Geometry.Spatial
         /// </summary>
         /// <param name="color">The face color.</param>
         /// <param name="nodes">The local face nodes.</param>
-        public void AddFace(Color color, params Vector3[] nodes)
+        public void AddFace(Color color, params Point3[] nodes)
         {
             var nodeIndex = new int[nodes.Length];
             for (int i = 0; i<nodes.Length; i++)
@@ -245,13 +244,13 @@ namespace JA.Drawing.Geometry.Spatial
         /// <param name="length">The panel length.</param>
         /// <param name="width">The panel width.</param>
         public void AddPanel(Color color,
-            Vector3 center,
+            Point3 center,
             Vector3 x_axis,
             float length,
             float width)
         {
             x_axis=Vector3.Normalize(x_axis);
-            Vector3 z_axis = center == Vector3.Zero ? Vector3.UnitZ : Vector3.Normalize(center);
+            Vector3 z_axis = center == Point3.Empty ? Vector3.UnitZ : Vector3.Normalize(center.Position);
             var y_axis = Vector3.Cross(z_axis, x_axis);
 
             AddFace(color,
@@ -277,17 +276,17 @@ namespace JA.Drawing.Geometry.Spatial
             if (inverse)
             {
                 Matrix4x4.Invert(transform, out var inv);
-                return new Mesh3(UnitSystem, nodeList.Select((n) => Vector3.Transform(n, inv)), faceList);
+                return new Mesh3(UnitSystem, nodeList.Select((n) => Point3.Transform(n, inv)), faceList);
             }
-            return new Mesh3(UnitSystem, nodeList.Select((n) => Vector3.Transform(n, transform)), faceList);
+            return new Mesh3(UnitSystem, nodeList.Select((n) => Point3.Transform(n, transform)), faceList);
         }
         public Mesh3 Rotate(Quaternion rotation)
         {
             return new Mesh3(UnitSystem,
-                nodeList.Select((n) => Vector3.Transform(n, rotation)),
+                nodeList.Select((n) => Point3.Transform(n, rotation)),
                 faceList);
         }
-        public Mesh3 Rotate(Quaternion rotation, Vector3 pivot)
+        public Mesh3 Rotate(Quaternion rotation, Point3 pivot)
         {
             return new Mesh3(UnitSystem,
                 nodeList.Select((n) => pivot+Vector3.Transform(n-pivot, rotation)),
@@ -316,32 +315,32 @@ namespace JA.Drawing.Geometry.Spatial
             var mesh = new Mesh3(units);
             mesh.AddPanel(
                 color,
-                new Vector3(0, sizeY/2, 0),
+                Point3.FromPosition(0, sizeY/2, 0),
                 Vector3.UnitX,
                 sizeX, sizeZ);
             mesh.AddPanel(
                 color,
-                new Vector3(0, -sizeY/2, 0),
+                Point3.FromPosition(0, -sizeY/2, 0),
                 Vector3.UnitX,
                 sizeX, sizeZ);
             mesh.AddPanel(
                 color,
-                new Vector3(sizeX/2, 0, 0),
+                Point3.FromPosition(sizeX/2, 0, 0),
                 Vector3.UnitZ,
                 sizeZ, sizeY);
             mesh.AddPanel(
                 color,
-                new Vector3(-sizeX/2, 0, 0),
+                Point3.FromPosition(-sizeX/2, 0, 0),
                 Vector3.UnitZ,
                 sizeZ, sizeY);
             mesh.AddPanel(
                 color,
-                new Vector3(0, 0, sizeZ/2),
+                Point3.FromPosition(0, 0, sizeZ/2),
                 Vector3.UnitX,
                 sizeX, sizeY);
             mesh.AddPanel(
                 color,
-                new Vector3(0, 0, -sizeZ/2),
+                Point3.FromPosition(0, 0, -sizeZ/2),
                 Vector3.UnitX,
                 sizeX, sizeY);
             return mesh;
@@ -356,14 +355,14 @@ namespace JA.Drawing.Geometry.Spatial
             mesh.Tesselate(3);
             for (int i = 0; i<mesh.nodeList.Count; i++)
             {
-                var n = mesh.nodeList[i];
-                float d = mesh.nodeList[i].Length();
+                var n = mesh.nodeList[i].Position;
+                float d = n.Length();
                 (float x, float y, float z)=(n.X, n.Y, n.Z);
                 x=Min(1, Max(0, x));
                 y=Min(1, Max(0, y));
                 z=Min(1, Max(0, z));
-                n=new Vector3(x, y, z);
-                mesh.nodeList[i]=radius*Vector3.Normalize(n);
+                n= Vector3.Normalize(new Vector3(x, y, z));
+                mesh.nodeList[i] = Point3.FromPosition(radius*n);
             }
             return mesh;
         }
@@ -377,12 +376,12 @@ namespace JA.Drawing.Geometry.Spatial
         public static Mesh3 CreatePyramid(UnitSystem units, Color color, float @base, float height)
         {
             var mesh = new Mesh3(units);
-            mesh.nodeList.Add(new Vector3(-@base/2, -@base/2, 0));
-            mesh.nodeList.Add(new Vector3(@base/2, -@base/2, 0));
-            mesh.nodeList.Add(new Vector3(@base/2, @base/2, 0));
-            mesh.nodeList.Add(new Vector3(-@base/2, @base/2, 0));
+            mesh.nodeList.Add(Point3.FromPosition(-@base/2, -@base/2, 0));
+            mesh.nodeList.Add(Point3.FromPosition(@base/2, -@base/2, 0));
+            mesh.nodeList.Add(Point3.FromPosition(@base/2, @base/2, 0));
+            mesh.nodeList.Add(Point3.FromPosition(-@base/2, @base/2, 0));
+            mesh.nodeList.Add(Point3.Origin + height*Vector3.UnitZ);
             mesh.faceList.Add(new Face(color, 3, 2, 1, 0));
-            mesh.nodeList.Add(height*Vector3.UnitZ);
             mesh.faceList.Add(new Face(color, 4, 0, 1));
             mesh.faceList.Add(new Face(color, 4, 1, 2));
             mesh.faceList.Add(new Face(color, 4, 2, 3));
@@ -394,8 +393,8 @@ namespace JA.Drawing.Geometry.Spatial
 
         #region Imports
         public static bool ImportSTL(UnitSystem unit, string filePath, Color color, out Mesh3 mesh)
-            => ImportSTL(unit, filePath, color, out mesh, Vector3.Zero);
-        public static bool ImportSTL(UnitSystem unit, string filePath, Color color, out Mesh3 mesh, Vector3 localOrigin)
+            => ImportSTL(unit, filePath, color, out mesh, Point3.Origin);
+        public static bool ImportSTL(UnitSystem unit, string filePath, Color color, out Mesh3 mesh, Point3 localOrigin)
         {
             Vector3 Text_ReadVector3(string lineString)
             {
@@ -491,7 +490,10 @@ namespace JA.Drawing.Geometry.Spatial
                             byteIndex+=2; // Attribute byte count
 
                             // eat the surface normals
-                            mesh.AddFace(color, vert1 - localOrigin, vert2 - localOrigin, vert3 - localOrigin);
+                            mesh.AddFace(color, 
+                                vert1 - localOrigin, 
+                                vert2 - localOrigin, 
+                                vert3 - localOrigin);
                         }
                         catch
                         {

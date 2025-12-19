@@ -1,5 +1,5 @@
-﻿using JA.LinearAlgebra.Geometry.Spatial;
-using JA.LinearAlgebra.Screws;
+﻿using JA.LinearAlgebra.Screws;
+using JA.LinearAlgebra.Spatial;
 
 namespace JA.Dynamics.Featherstone
 {

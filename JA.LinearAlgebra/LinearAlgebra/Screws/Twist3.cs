@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-using JA.LinearAlgebra.Geometry.Spatial;
+using JA.LinearAlgebra.Spatial;
 
 namespace JA.LinearAlgebra.Screws
 {
@@ -70,7 +70,7 @@ namespace JA.LinearAlgebra.Screws
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 Direction(Vector33 twist)
-            => twist.angular.Normalize();
+            => twist.angular.ToNormalized();
         /// <summary>
         /// The pitch of a twist.
         /// </summary>
